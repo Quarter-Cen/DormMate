@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Dropdown List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        /* สไตล์ของ dropdown container */
+        .dropdown {
+            padding: 15px;
+            position: absolute;
+            display: inline-block;
+        }
+
+        /* สไตล์ของ dropdown button */
+        .dropdown button {
+            background: linear-gradient(to right, rgba(133, 173, 248, 0.5), rgba(2, 10, 69, 0.5));
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        /* สไตล์ของ dropdown content */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(249, 249, 249, 0.0);
+            min-width: 160px;
+            z-index: 1;
+            border-radius: 8px;
+            padding: 8px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* สไตล์ของ dropdown content items */
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, rgba(133, 173, 248, 0.3), rgba(2, 10, 69, 0.5));
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* สไตล์ของ dropdown content items เมื่อ hover */
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* แสดง dropdown content เมื่อ hover บน dropdown */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* เปลี่ยนสีของ dropdown button เมื่อ hover */
+        .dropdown:hover button {
+            background-color: #3e8e41;
+        }
+
+        .flex-container {
+            display: flex;
+        }
+
+        .left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body,
+        html {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        .bill-details {
+            text-align: center;
+            align-items: flex-start;
+            background-color: #38d1e9;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            width: 25%;
+            margin-bottom: 8px;
+        }
+
+        .textarea-container {
+            display: flex;
+            width: 94%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+
+        .textarea-container .left-column,
+        .textarea-container .right-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .textarea-container textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: none;
+        }
+
+        .payment-container {
+            position: relative;
+            width: 90%;
+            margin-top: 8px;
+        }
+
+        .payment-amount2 {
+            display: flex;
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .payment-amount {
+            white-space: nowrap;
+            text-align: center;
+            background-color: #38d1e9;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20%;
+            z-index: 2;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="height: 100%;">
+        <div class="flex-container" style="height: 100%;">
+            <div class="dropdown">
+                <button>ช่องทางการชำระเงิน</button>
+                <div class="dropdown-content">
+                    <a href="#">Link 1</a>
+                    <a href="#">Link 2</a>
+                    <a href="#">Link 3</a>
+                </div>
+            </div>
+            <div class="left"
+                style="background-image: url('picture/Bgleft.png'); background-position: center; width: 100%; height: 100%; justify-content: center; align-items: center;">
+                <div style="width: 70%; display: flex; flex-direction: column; align-items: flex-start;">
+                    <div class="bill-details">
+                        รายละเอียดบิล
+                    </div>
+                    <div class="textarea-container" style="background-color: #f1f1f1;">
+                        <div class="left-column">
+                            <textarea readonly>- ค่าเช่าห้อง
+- ค่าน้ำ
+- ค่าไฟ
+</textarea>
+                        </div>
+                        <div class="right-column">
+                            <textarea id="detail" readonly>3200
+20
+300
+</textarea>
+                        </div>
+                    </div>
+                    <div class="payment-container">
+                        <div class="payment-amount2">
+                            <div style="flex: 15%;">
+                            </div>
+                            <div id="total_amount" style="flex: 85%; text-align: center; color: black;">
+                            </div>
+                        </div>
+                        <div class="payment-amount">
+                            ยอดชำระ
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="right"
+                style="width: 100%; height: 100%; justify-content: center; align-items: center;">
+                <div style="width: 70%; display: flex; flex-direction: column; align-items: center;">
+                    <div style="width: 100%;">
+                        <img id="imgQR" style="width: 100%; object-fit: contain;">
+                        <button id="QrButton"
+                        style="background: linear-gradient(to right, rgba(133, 173, 248, 0.5), rgba(2, 10, 69, 0.5)); color: white; padding: 16px; font-size: 16px; border: none; cursor: pointer; width: 100%; border-radius: 8px;"
+                         onclick="genQR()">Generate QrCode</button>
+                        <div id="timerElement"style="text-align: center; margin-top: 10px; display: none;">
+                            เวลาที่เหลือ : 03:00
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Dropdown List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        /* Styling for dropdown container */
+        .dropdown {
+            padding: 15px;
+            position: absolute;
+            display: inline-block;
+        }
+
+        /* Styling for dropdown button */
+        .dropdown button {
+            background: linear-gradient(to right, rgba(133, 173, 248, 0.5), rgba(2, 10, 69, 0.5));
+            color: white;
+            padding: 16px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+
+        /* Styling for dropdown content */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(249, 249, 249, 0.0);
+            min-width: 160px;
+            z-index: 1;
+            border-radius: 8px;
+            padding: 8px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Styling for dropdown content items */
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, rgba(133, 173, 248, 0.3), rgba(2, 10, 69, 0.5));
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Styling for dropdown content items on hover */
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* Show dropdown content on hover */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Change dropdown button color on hover */
+        .dropdown:hover button {
+            background-color: #3e8e41;
+        }
+
+        .flex-container {
+            display: flex;
+        }
+
+        .left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body,
+        html {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+
+        }
+
+        .bill-details {
+            text-align: center;
+            align-items: flex-start;
+            background-color: #38d1e9;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            width: 25%;
+            margin-bottom: 8px;
+        }
+
+        .textarea-container {
+            display: flex;
+            width: 94%;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            padding: 8px;
+        }
+
+        .textarea-container .left-column,
+        .textarea-container .right-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .textarea-container textarea {
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: none;
+        }
+
+        .payment-container {
+            position: relative;
+            width: 90%;
+            margin-top: 8px;
+        }
+
+        .payment-amount2 {
+            display: flex;
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .payment-amount {
+            white-space: nowrap;
+            text-align: center;
+            background-color: #38d1e9;
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20%;
+            z-index: 2;
+        }
+
+        .table-container {
+            width: 100%;
+            max-height: 500px;
+
+            overflow-y: auto;
+            border: none;
+            padding: 0;
+            box-sizing: border-box;
+            margin: 0;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 8px;
+        }
+
+        table thead {
+            border-radius: 8px;
+            position: sticky;
+            top: 0;
+            background-color: #004367;
+            color: white;
+            text-align: left;
+            z-index: 10;
+        }
+
+        table th{
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+        table td {
+            background-color: #ecf1ff21;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        table tbody tr {
+            cursor: pointer;
+        }
+
+        table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .right-column {
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: calc(100vh - 120px);
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .bill-header {
+            font-size: 30px;
+            font-weight: bold;
+            margin-bottom: 55px;
+            color: #333;
+        }
+
+        .navbar {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+            top: 0;
+            background-color: #fdfdfd;
+            display: flex;
+            margin-right: 10px;
+            justify-content: space-between;
+            align-items: center;
+            color: rgb(10, 10, 10);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            height: 8%;
+        }
+
+        .navbar .left-nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            margin-left: 100px;
+        }
+
+        .navbar .left-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .navbar .left-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        /* Main content to push footer to bottom */
+        .content {
+            padding: 20px;
+            margin-top: 60px;
+            /* ความสูงของ navbar */
+            margin-bottom: 60px;
+            /* ความสูงของ footer */
+            box-sizing: border-box;
+            overflow-y: auto;
+            /* ให้สามารถเลื่อนเนื้อหาแนวตั้งได้ */
+            height: calc(100vh - 120px);
+            /* ปรับความสูงให้พอดีกับพื้นที่มองเห็นของหน้าจอ */
+        }
+
+        /* Styles for the footer */
+        .footer {
+            background-color: #004367;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+            height: 3%;
+        }
+
+        .footer .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer .footer-content p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .footer .footer-content a {
+            color: #00bcd4;
+            text-decoration: none;
+        }
+
+        .footer .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .footer-content .social-icons {
+            margin-top: 10px;
+        }
+
+        .footer .footer-content .social-icons a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 20px;
+        }
+
+        .footer .footer-content .social-icons a:hover {
+            color: #00bcd4;
+        }
+
+        .gradient-background {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(to bottom, #ffffff, #76d4fa);
+            /* ปรับ gradient ตามที่คุณต้องการ */
+            z-index: -1;
+            /* ทำให้ gradient อยู่ด้านหลังเนื้อหา */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="left-nav">
+            <a href="#home">Home</a>
+            <a href="#service">Service</a>
+            <a href="#feature">Feature</a>
+            <a href="#product">Product</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="right-nav">
+            <a href="#signin">Sign In</a>
+            <a href="#signup" style="background-color: #186a99; color: #f1f1f1;">Sign Up</a>
+        </div>
+    </div>
+
+    <div style="height: 100%;">
+
+        <div class="flex-container" style="height: 100%;">
+
+            <div class="right" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
+
+                <div class="right-column">
+                    <h2 class="bill-header">บิลของคุณ</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>เลขที่ใบเสร็จ</th>
+                                    <th>เลขที่ห้อง</th>
+                                    <th>จำนวนเงิน</th>
+                                    <th>สถานะ</th>
+                                    <th>อัปเดตเมื่อ</th>
+                                    <th>เลขที่อ้างอิง</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Table rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Your Company. All rights reserved.</p>
+                <p>
+                    <a href="#privacy">Privacy Policy</a> |
+                    <a href="#terms">Terms of Service</a>
+                </p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="gradient-background"></div>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+    <script src="index.js"></script>
+</body>
+
+</html>

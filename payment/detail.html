@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Details</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        body,
+        html {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: auto; /* ซ่อน scroll bars */
+        }
+
+        .navbar {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+            top: 0;
+            background-color: #fdfdfd;
+            display: flex;
+            margin-right: 10px;
+            justify-content: space-between;
+            align-items: center;
+            color: rgb(10, 10, 10);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            height: 8%;
+        }
+
+        .navbar .left-nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            margin-left: 100px;
+        }
+
+        .navbar .left-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .navbar .left-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .content {
+            padding: 20px;
+            margin-top: 60px;
+            max-width: 1200px;
+            margin: 60px auto 20px;
+            box-sizing: border-box;
+        }
+
+        .bill-details {
+            background-color: #fdfdfd00;
+            color: rgb(7, 7, 7);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .bill-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .bill-details table th,
+        .bill-details table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+
+        .bill-details table th {
+            background-color: #004367;
+            color: white;
+        }
+
+        .bill-details .total-amount-row td {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .footer {
+            background-color: #004367;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+            height: 3%;
+        }
+
+        .footer .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer .footer-content p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .footer .footer-content a {
+            color: #00bcd4;
+            text-decoration: none;
+        }
+
+        .footer .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .footer-content .social-icons {
+            margin-top: 10px;
+        }
+
+        .footer .footer-content .social-icons a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 20px;
+        }
+
+        .footer .footer-content .social-icons a:hover {
+            color: #00bcd4;
+        }
+        .gradient-background {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 20%;
+            background: linear-gradient(to bottom, #ffffff, #76d4fa);
+            /* ปรับ gradient ตามที่คุณต้องการ */
+            z-index: -1;
+            /* ทำให้ gradient อยู่ด้านหลังเนื้อหา */
+        }
+        
+    </style>
+</head>
+
+<body>
+    <div class="navbar" >
+        <div class="left-nav">
+            <a href="#home">Home</a>
+            <a href="#service">Service</a>
+            <a href="#feature">Feature</a>
+            <a href="#product">Product</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="right-nav">
+            <a href="#signin">Sign In</a>
+            <a href="#signup" style="background-color: #186a99; color: #f1f1f1;">Sign Up</a>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="bill-details">
+            <!-- Bill details will be inserted here -->
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Your Company. All rights reserved.</p>
+            <p>
+                <a href="#privacy">Privacy Policy</a> |
+                <a href="#terms">Terms of Service</a>
+            </p>
+            <div class="social-icons">
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="gradient-background"></div>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="detail.js"></script>
+</body>
+
+</html>

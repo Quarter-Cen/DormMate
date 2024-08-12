@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- ส่วนที่ไม่แสดงออกไปในหน้าจอของ Browser -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document 2</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <a href="user.html">Go to User Management</a>
+  <!-- ส่วนที่แสดงออกไปในหน้าจอของ Browser -->
+
+  <div class="container">
+    <div class="center"style="margin-bottom: 8px;">
+      <button id="loginBtn" class="button">Login Google</button>
+    </div>
+
+    <h1>Upload Payment Slip</h1>
+  <form action="http://localhost:3000/upload" method="post" enctype="multipart/form-data">
+      <label for="slip">Select Payment Slip:</label>
+      <input type="file" id="slip" name="slip" accept="image/*" required>
+      <button type="submit">Upload</button>
+  </form>
+
+  <h1>Login and Request Email Data</h1>
+
+  <!-- ปุ่มสำหรับ login ด้วย OAuth -->
+
+  <div id="timerContainer">
+    <p id="timer">Time remaining: 03:00</p>
+  </div>
+  <button id="stopBtn">Stop</button>
+  <!-- ส่วนสำหรับแสดงข้อมูลอีเมลหลังการ login -->
+  <div id="emailsContainer" style="display: none;">
+    <h2>Email Data</h2>
+    <button id="getEmailsBtn">Get Emails</button>
+    <div id="emailsList"></div>
+  </div>
+  <div>
+    <input type="text" id="amount" placeholder="amount">
+  </div>
+  <img id="imgQR" style="width: 500px; object-fit: contain;">
+  </div>
+
+
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="mail.js"></script>
+</body>
+</html>
