@@ -1,5 +1,8 @@
 const BASE_URL = 'http://localhost:8000';
 
+
+
+
 window.onload = async () => {
     const urlParams = new URLSearchParams(window.location.search);
     const billId = urlParams.get('bill_id');
@@ -24,9 +27,24 @@ window.onload = async () => {
 
 }
 
+const button = document.getElementById('hideButton');
+    const disableHover = document.getElementById('disableHover');
+
+    function nevigator() {
+        disableHover.classList.add('hidden'); // เพิ่มคลาสเพื่อทำให้ค่อยๆ หายไป
+    }
+
+    function nevigator2() {
+        disableHover.classList.remove('hidden'); // เอาคลาสออกเพื่อทำให้ค่อยๆ แสดงกลับ
+    }
+
+    button.addEventListener('mouseover', nevigator);
+    button.addEventListener('mouseout', nevigator2);
 
 
-
+// ใช้ mouseover เพื่อตั้งค่าให้ฟังก์ชันทำงานเมื่อเมาส์อยู่เหนือปุ่ม
+button.addEventListener('mouseover', nevigator);
+button.addEventListener('mouseout', nevigator2);
 function genQR() {
     // ดึงค่า bill_id จาก URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -95,3 +113,25 @@ async function pollForAdminRes() {
         setTimeout(pollForAdminRes, 5000); // Retry after 5 seconds
     }
   }
+
+
+// ทำการลบคิวเมื่อผู้ใช้ออกจากหน้า
+window.addEventListener('beforeunload', () => {
+    if (pollInterval) {
+        clearTimeout(pollInterval);
+    }
+    $.ajax({
+        method: 'POST',
+        url: `${BASE_URL}/cancelQueue`,
+        contentType: 'application/json',
+        data: JSON.stringify({
+            bill_id: new URLSearchParams(window.location.search).get('bill_id')
+        }),
+        success: function() {
+            console.log('Queue cancelled');
+        },
+        error: function(err) {
+            console.log('Error cancelling queue:', err);
+        }
+    });
+});

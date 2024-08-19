@@ -1,0 +1,44 @@
+/* ตั้งค่าให้พื้นหลังเต็มหน้าจอ */
+body, html {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* ซ่อน scrollbar ของ body */
+    height: 100%;
+    width: 100%;
+}
+
+/* กำหนดพื้นที่สำหรับวงกลมพื้นหลัง */
+.background-container {
+    position: fixed; /* ติดอยู่ที่พื้นหลัง */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* อยู่ด้านหลังของเนื้อหา */
+    overflow: hidden; /* ซ่อนการเลื่อนที่อาจเกิดขึ้น */
+}
+
+.background-container .circle {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(0, 150, 136, 0.5); /* สีพื้นหลังและความโปร่งใส */
+    pointer-events: none; /* ป้องกันไม่ให้คลิก */
+}
+
+/* กำหนดเนื้อหาที่อยู่บนพื้นหลัง */
+.content {
+    position: relative;
+    height: 2000px; /* ขนาดสูงของเนื้อหาเพื่อทำให้มีการเลื่อน */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* ตั้งค่าสำหรับการแสดงผลรายละเอียดใบแจ้งหนี้ */
+.bill-details {
+    position: relative;
+    z-index: 1;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}

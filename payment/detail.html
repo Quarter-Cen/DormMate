@@ -14,7 +14,8 @@
             padding: 0;
             height: 100%;
             width: 100%;
-            overflow: auto; /* ซ่อน scroll bars */
+            overflow: auto;
+            /* ซ่อน scroll bars */
         }
 
         .navbar {
@@ -154,6 +155,7 @@
         .footer .footer-content .social-icons a:hover {
             color: #00bcd4;
         }
+
         .gradient-background {
             position: absolute;
             bottom: 0;
@@ -165,12 +167,71 @@
             z-index: -1;
             /* ทำให้ gradient อยู่ด้านหลังเนื้อหา */
         }
-        
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* เบลอพื้นหลัง */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* ให้ Pop-up อยู่เหนือเนื้อหาอื่น */
+            visibility: visible;
+            /* แสดง Pop-up เริ่มต้น */
+            opacity: 1;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .loading-overlay.hidden {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .loading-popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            /* สีพื้นหลัง */
+            border-top: 8px solid #3498db;
+            /* สีของวงกลมหมุน */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
     </style>
 </head>
 
 <body>
-    <div class="navbar" >
+    
+    <div class="navbar">
         <div class="left-nav">
             <a href="#home">Home</a>
             <a href="#service">Service</a>
@@ -183,7 +244,6 @@
             <a href="#signup" style="background-color: #186a99; color: #f1f1f1;">Sign Up</a>
         </div>
     </div>
-
     <div class="content">
         <div class="bill-details">
             <!-- Bill details will be inserted here -->
@@ -202,6 +262,12 @@
                 <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                 <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
             </div>
+        </div>
+    </div>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-popup">
+            <div class="spinner"></div>
+            <p>Loading</p>
         </div>
     </div>
     <div class="gradient-background"></div>

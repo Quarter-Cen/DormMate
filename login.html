@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 3. form -->
+        <div class="header form-input">
+          Login form
+        </div>
+        <div class="flex form-input">
+          <div class="header-form">Email</div>
+          <input class="form" name="email" type="text">
+        </div>
+        <div class="flex form-input">
+          <div class="header-form">รหัสผ่าน</div>
+          <input class="form" name="password" type="password">
+        </div>
+
+        <div class="form-input center" >
+          <a href="https://shopee.com">T&C</a>
+        </div>
+        <div id="message" class="message">
+
+        </div>
+        <div class="center" style="margin-bottom: 8px;">
+        <button onclick="login()" class="button">login</button>
+        </div>
+      </div>
+      
+      <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+      <script src="login.js"></script>
+</body>
+</html>

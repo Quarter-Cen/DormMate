@@ -106,8 +106,6 @@ const createBills = async() => {
 
 }
 
-
-
 const submitData =  async () => {
     let firstNameDOM = document.querySelector('input[name=firstname]')
     let lastNameDOM = document.querySelector('input[name=lastname]')

@@ -5,7 +5,12 @@ window.onload = async () => {
 }
 
 const loadData = async () =>{
-    const response = await axios.get(`${BASE_URL}/users`)
+    const authToken = sessionStorage.getItem('token')
+    const response = await axios.get(`${BASE_URL}/users`, {
+        headers : {
+            'authorization' : `Bearer ${authToken}`
+        }
+    })
     console.log(response)
 
     const userDOM = document.getElementById('user')

@@ -96,7 +96,7 @@
             padding: 0;
             height: 100%;
             width: 100%;
-
+            overflow: hidden;
         }
 
         .bill-details {
@@ -110,6 +110,7 @@
             border-radius: 8px;
             width: 25%;
             margin-bottom: 8px;
+            overflow-y: scroll;
         }
 
         .textarea-container {
@@ -176,7 +177,6 @@
         .table-container {
             width: 100%;
             max-height: 500px;
-
             overflow-y: auto;
             border: none;
             padding: 0;
@@ -201,13 +201,14 @@
             z-index: 10;
         }
 
-        table th{
+        table th {
             padding: 12px;
             border-bottom: 1px solid #ddd;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
         }
+
         table td {
             background-color: #ecf1ff21;
             padding: 12px;
@@ -218,6 +219,7 @@
         }
 
         table tbody tr {
+            background-color: #fafafa;
             cursor: pointer;
         }
 
@@ -241,10 +243,14 @@
         }
 
         .bill-header {
+            background-color: #004367;
+            padding: 6px;
             font-size: 30px;
             font-weight: bold;
             margin-bottom: 55px;
-            color: #333;
+            color: #fcfcfc;
+            border: 1px solid #004367;
+            border-radius: 8px;
         }
 
         .navbar {
@@ -367,8 +373,139 @@
             height: 20%;
             background: linear-gradient(to bottom, #ffffff, #76d4fa);
             /* ปรับ gradient ตามที่คุณต้องการ */
-            z-index: -1;
+            z-index: -10;
             /* ทำให้ gradient อยู่ด้านหลังเนื้อหา */
+        }
+
+        #bill-details {
+            position: relative;
+            overflow: auto;
+            /* ทำให้มี scroll bar */
+            height: 400px;
+            /* กำหนดความสูงของ container */
+        }
+
+        #background-circle1 {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 300px;
+            /* ขนาดของวงกลม */
+            height: 300px;
+            /* ขนาดของวงกลม */
+            background: linear-gradient(to bottom, #ffffffd5, #76d4fa);
+            /* สีพื้นหลังแบบ gradient */
+            border-radius: 50%;
+            pointer-events: none;
+            /* ป้องกันไม่ให้คลิกบนวงกลม */
+            z-index: -1;
+        }
+
+        #background-circle2 {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 300px;
+            /* ขนาดของวงกลม */
+            height: 300px;
+            /* ขนาดของวงกลม */
+            background: linear-gradient(to bottom, #ffffffd5, #76d4fa);
+            /* สีพื้นหลังแบบ gradient */
+            border-radius: 50%;
+            pointer-events: none;
+            /* ป้องกันไม่ให้คลิกบนวงกลม */
+            z-index: -1;
+        }
+
+        #background-circle3 {
+            position: absolute;
+            bottom: -15%;
+            left: 55%;
+            width: 300px;
+            /* ขนาดของวงกลม */
+            height: 300px;
+            /* ขนาดของวงกลม */
+            background: linear-gradient(to bottom, #ffffffd5, #76d4fa);
+            /* สีพื้นหลังแบบ gradient */
+            border-radius: 50%;
+            pointer-events: none;
+            /* ป้องกันไม่ให้คลิกบนวงกลม */
+            z-index: -1;
+        }
+
+        #background-circle4 {
+            position: absolute;
+            top: -50;
+            right: 5;
+            width: 300px;
+            /* ขนาดของวงกลม */
+            height: 300px;
+            /* ขนาดของวงกลม */
+            background: linear-gradient(to bottom, #ffffffd5, #76d4fa);
+            /* สีพื้นหลังแบบ gradient */
+            border-radius: 50%;
+            pointer-events: none;
+            /* ป้องกันไม่ให้คลิกบนวงกลม */
+            z-index: -1;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* เบลอพื้นหลัง */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* ให้ Pop-up อยู่เหนือเนื้อหาอื่น */
+            visibility: visible;
+            /* แสดง Pop-up เริ่มต้น */
+            opacity: 1;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .loading-overlay.hidden {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .loading-popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            /* สีพื้นหลัง */
+            border-top: 8px solid #3498db;
+            /* สีของวงกลมหมุน */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
         }
     </style>
 </head>
@@ -391,12 +528,18 @@
     <div style="height: 100%;">
 
         <div class="flex-container" style="height: 100%;">
-
+            
             <div class="right" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
-
+                
                 <div class="right-column">
                     <h2 class="bill-header">บิลของคุณ</h2>
-                    <div class="table-container">
+                    <input type="text" id="searchBar" placeholder="ค้นหา..." />
+                    <div id="background-circle1"></div>
+                    <div id="background-circle2"></div>
+                    <div id="background-circle3"></div>
+                    <div id="background-circle4"></div>
+                    <div id="bill-details" class="table-container">
+                        
                         <table>
                             <thead>
                                 <tr>
@@ -433,7 +576,12 @@
             </div>
         </div>
     </div>
-
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-popup">
+            <div class="spinner"></div>
+            <p>Loading</p>
+        </div>
+    </div>
     <div class="gradient-background"></div>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
