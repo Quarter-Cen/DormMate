@@ -4,7 +4,7 @@ const BASE_URL = 'http://localhost:8000';
 window.onload = async () => {
     const authToken = sessionStorage.getItem('token');
 
-    if (!authToken) {
+     if ( !authToken) {
         console.error('Token not found in sessionStorage');
         window.location.href = `${BASE_URL}/login.html`;
         return;
@@ -19,6 +19,8 @@ window.onload = async () => {
                 'authorization': `Bearer ${authToken}`
             }
         });
+
+        const content = document.querySelector('.box');
 
         const user = userResponse.data[0];
 
@@ -54,6 +56,7 @@ window.onload = async () => {
         });
 
         const data = response.data;
+        console.log(data)
         const newRoom_num = data[0].room_num;
 
         // อัปเดต URL ด้วย billId ใหม่
@@ -122,11 +125,12 @@ window.onload = async () => {
                 window.location.href = `detail.html?id=${billId}`;
             });
         });
+        content.style.display = 'block';
 
     } catch (error) {
         console.error('Error:', error.response?.data?.message || error.message);
 
-        if (error.response?.data?.message === 'Invalid token' || error.response?.data?.message === 'Token not found') {
+        if (error.response?.data?.message === 'Invalid or expired token') {
             window.location.href = `${BASE_URL}/login.html`;
         }
 

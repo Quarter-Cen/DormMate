@@ -17,40 +17,43 @@ window.onload = async () => {
         window.location.href = `detail.html?id=${billId}`;
         return;
     }
-    const userResponse = await axios.get(`${BASE_URL}/users`, {
-        headers: {
-            'authorization': `Bearer ${authToken}`
-        }
-    });
-
-    const user = userResponse.data[0];
-
-    // Update the navbar with user's full name
-    const rightNav = document.querySelector('.right-nav');
-    rightNav.innerHTML = `
-    <div style="
-        display: flex;
-        align-items: center;
-        padding: 10px 15px;
-        margin-left: 10px;
-        margin-right: 10px;
-        background-color: #186a99;
-        border-radius: 10px;
-        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-        pointer-events: none;
-    ">
-        <span style="
-            color: white;
-            font-size: 18px;
-            padding-left: 10px;
-            padding-right: 10px;
-            text-transform: capitalize;
-        ">
-            ${user.firstname} ${user.lastname}
-        </span>
-    </div>`;
+    
     try {
 
+        const userResponse = await axios.get(`${BASE_URL}/users`, {
+            headers: {
+                'authorization': `Bearer ${authToken}`
+            }
+        });
+    
+        const user = userResponse.data[0];
+    
+        // Update the navbar with user's full name
+        const rightNav = document.querySelector('.right-nav');
+        rightNav.innerHTML = `
+        <div style="
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+            background-color: #186a99;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            pointer-events: none;
+        ">
+            <span style="
+                color: white;
+                font-size: 18px;
+                padding-left: 10px;
+                padding-right: 10px;
+                text-transform: capitalize;
+            ">
+                ${user.firstname} ${user.lastname}
+            </span>
+        </div>`;
+
+        const content = document.querySelector('.box');
 
 
         const response = await axios.get(`${BASE_URL}/getBillDetails/${billId}`, {
@@ -157,16 +160,17 @@ window.onload = async () => {
             paymentButton.style.height = '60px';
 
             paymentButton.addEventListener('click', () => {
+                sessionStorage.setItem('canAccessPayment', 'true');
                 window.location.href = `QrCode/index.html?bill_id=${billId}`;
             });
 
             paymentButtonContainer.appendChild(paymentButton);
         }
-
+        content.style.display = 'block';
     } catch (error) {
         console.error('Error:', error);
         document.querySelector('.bill-details').innerText = 'Error fetching bill details';
-        if (error.response?.data?.message === 'Invalid token' || error.response?.data?.message === 'Token not found') {
+        if (error.response?.data?.message === 'Invalid or expired token') {
             window.location.href = `${BASE_URL}/login.html`;
         }
     }

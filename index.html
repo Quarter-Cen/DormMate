@@ -57,6 +57,12 @@
         <input name="interest" type="checkbox" value="หนังสือ"> หนังสือ
       </div>
       <div>
+        <i name="interest_error" style="display: none; color: brown;">
+          <!-- ที่ไว้ใส่ error -->
+           กรุณาใส่ความสนใจ
+        </i>
+      </div>
+      <div>
         <input name="interest" type="checkbox" value="วิดีโอเกม"> วิดีโอเกม
       </div>
       <div>
@@ -81,7 +87,7 @@
 
   <div class="container">
     <div class="center" style="margin-top: 8px;">
-      <button onclick="createBills()" class="button">Create Bills</button>
+      <button onclick="submitData()" class="button">Create Bills</button>
     </div>  
   </div>
 

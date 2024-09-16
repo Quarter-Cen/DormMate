@@ -4,33 +4,150 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="styles.css">
+<style>
+  /* Global Styles */
+  * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+  }
+
+  body {
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-image:url('img/Login.svg'); /* สีพื้นหลังสามารถเปลี่ยนแปลงได้ */
+      background-size: cover;
+      background-position: center;
+  }
+
+  .login-container {
+      padding: 40px;
+      border-radius: 10px;
+      text-align: center;
+      width: 35%;
+      
+  }
+
+  .login-container img {
+      width: 300px;
+      margin-bottom: 20px;
+  }
+
+  .login-container h1 {
+      font-size: 54px;
+      color: #3b82f6;
+      margin-bottom: 30px;
+  }
+
+  .login-container p {
+      margin-bottom: 10px;
+      text-align: left;
+      font-size: 18px;
+      color: #333;
+  }
+
+  .login-container input[type="email"],
+  .login-container input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+  }
+
+  .login-container .password-container {
+      position: relative;
+  }
+
+  .login-container .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 12px;
+      cursor: pointer;
+  }
+
+  .login-container input[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+  }
+
+  .login-container input[type="submit"]:hover {
+      background-color: #2563eb;
+  }
+
+  .login-container .forgot-password {
+      text-align: right;
+      margin-top: 10px;
+  }
+
+  .login-container .forgot-password a {
+      font-size: 12px;
+      color: #3b82f6;
+      text-decoration: none;
+  }
+
+  .login-container .forgot-password a:hover {
+      text-decoration: underline;
+  }
+
+  .button {
+    margin-top: 14px;
+    border-radius: 6px;
+    padding: 14px;
+    width: 70%;
+    border: none;
+    background-color: #5AC5FF;
+    color: floralwhite;
+    cursor: pointer;
+  }
+
+</style>
 </head>
 <body>
-    <div class="container">
-        <!-- 3. form -->
-        <div class="header form-input">
-          Login form
-        </div>
-        <div class="flex form-input">
-          <div class="header-form">Email</div>
-          <input class="form" name="email" type="text">
-        </div>
-        <div class="flex form-input">
-          <div class="header-form">รหัสผ่าน</div>
-          <input class="form" name="password" type="password">
-        </div>
 
-        <div class="form-input center" >
-          <a href="https://shopee.com">T&C</a>
-        </div>
-        <div id="message" class="message">
+</div>
+<div class="login-container">
+  <!-- Logo (ใส่ URL รูปได้เอง) -->
+  <img src="img/dormmate-high-resolution-logo-black-transparent.png" alt="Logo"> <!-- เว้นว่างไว้เพื่อใส่โลโก้ -->
+  
+  <!-- Title -->
+  <h1>Log in <span style="color: #a1c4fd;">to</span> account</h1>
 
-        </div>
-        <div class="center" style="margin-bottom: 8px;">
-        <button onclick="login()" class="button">login</button>
-        </div>
+  <!-- Login Form -->
+
+      <p>Email</p>
+      <input type="email" name="email" required style="margin-bottom: 16px;">
+      <div id="email-error-button-container" style="color: red; display: none; text-align: start; margin-bottom: 4px;">กรุณากรอกอีเมล์</div>
+      
+      
+      <p>Password</p>
+      <div class="password-container">
+          <input type="password" name="password" required>
+          <span class="toggle-password">#</span>
       </div>
+      <div id="password-error-button-container" style="color: red; display: none; text-align: start; margin-bottom: 4px;">กรุณากรอกรหัสผ่าน</div>
+      <div id="login-fail-button-container" style="color: red; display: none; text-align: end;"></div>
+
+      <!-- Forgot password link -->
+      <div class="forgot-password">
+          <a href="#">ลืมรหัสผ่าน</a>
+      </div>
+
+      <!-- Submit button -->
+      <button onclick="login()" class="button" name="login"><span style="font-size: x-large;">Login</span></button>
+
+</div>
       
       <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
       <script src="login.js"></script>

@@ -54,9 +54,13 @@ window.onload = async () => {
 
 const vaildateData = (userData) => {
   let errors = []
+  let error_interest = document.querySelector('i[name=interest_error]')
+  let error_firstname = document.querySelector('i[name=first_error]')
+  let error_lastname = document.querySelector('i[name=interest_error]')
 
   if (!userData.firstname) {
     errors.push('กรุณาใส่ชื่อ')
+    error_firstname.Style.display = 'block'
   }
   if (!userData.lastname) {
     errors.push('กรุณาใส่นามสกุล')
@@ -69,6 +73,7 @@ const vaildateData = (userData) => {
   }
   if (!userData.interest) {
     errors.push('กรุณาเลือกความสนใจ')
+    error_interest.Style.display = "block"
   }
   if (!userData.description) {
     errors.push('กรุณาใส่คำอธิบาย')
@@ -140,6 +145,7 @@ const submitData =  async () => {
       email: emailDOM.value,
       password: passwordDOM.value
     }
+
     console.log('submit data', userData)
 
     const errors = vaildateData(userData)

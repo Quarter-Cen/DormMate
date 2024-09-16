@@ -10,6 +10,9 @@ const QRCode = require('qrcode')
 const generatePayload = require('promptpay-qr')
 const _ = require('lodash')
 const jwt = require('jsonwebtoken')
+const multer = require('multer')
+const axios = require('axios');
+const FormData = require('form-data');
 
 // Constants
 const PORT = 8000;
@@ -37,7 +40,28 @@ const initMysql = async () => {
     });
 };
 
-const authenticateToken = (req, res, next) => {
+const storage = multer.memoryStorage();
+const upload = multer({
+    storage: storage,
+    fileFilter: (req, file, cb) => {
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/jfif', 'image/webp'];
+        if (allowedMimeTypes.includes(file.mimetype)) {
+            cb(null, true);
+        } else {
+            cb(new Error('Invalid file type. Only JPG, JPEG, PNG, JFIF, or WEBP files are allowed.'));
+        }
+    },
+});
+
+app.use((req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    next();
+});
+
+const authenticateToken = async (req, res, next) => {
     const authHeader = req.headers['authorization'];
 
     let authToken = ''
@@ -49,18 +73,25 @@ const authenticateToken = (req, res, next) => {
         return res.status(401).json({ message: 'Token not found' });
     }
 
-    jwt.verify(authToken, SECRET, async (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Invalid token' });
-        }
+    try {
+        const user = jwt.verify(authToken, SECRET);
         req.user = user;
 
-        const [result] = await conn.query(`SELECT * FROM user_rooms WHERE user_id = ?`, [req.user.id])
-        req.user.room = result[0].room_id
-        req.user.role = result[0].role
+        // Execute the query to find user's room and role
+        const [result] = await conn.query(`SELECT * FROM user_rooms WHERE user_id = ?`, [req.user.id]);
 
-        next();
-    });
+        if (result.length > 0) {
+            req.user.room = result[0].room_id;
+            req.user.role = result[0].role;
+        } else {
+            return res.status(403).json({ message: 'User has no assigned room or role' });
+        }
+
+        next(); // Continue to the next middleware or route handler
+    } catch (err) {
+        // Handle token verification error
+        return res.status(403).json({ message: 'Invalid or expired token' });
+    }
 };
 
 const authorizeOwnData = (req, res, next) => {
@@ -109,7 +140,7 @@ const authorizeBillDetailsAccess = async (req, res, next) => {
         );
 
         if (rows.length === 0 || (userRole !== 'admin' && userRole !== 'user')) {
-            return res.status(403).json({ 
+            return res.status(403).json({
                 message: 'Access denied: You do not have access to this room',
                 UID: req.user.id
             });
@@ -147,7 +178,7 @@ app.get('/', (req, res) => {
 });
 app.get('/payment/detail', (req, res) => {
     // ตรวจสอบว่าเส้นทางของไฟล์ถูกต้อง
-    res.sendFile(path.join(__dirname,'..', 'payment', 'detail.html'));
+    res.sendFile(path.join(__dirname, '..', 'payment', 'detail.html'));
 });
 
 app.get('/auth/google', (req, res) => {
@@ -170,17 +201,18 @@ app.get(`/getBills/:id?`, authenticateToken, authorizeOwnData, async (req, res) 
     try {
         let id = req.params.id;
         let bill = []
-        if (id === null || id === undefined || id === 'null'|| id === '') {
+        let room = req.user.room
+        if (id === null || id === undefined || id === 'null' || id === '') {
             id = req.user.room
 
         }
-        
-        if (req.user.role === 'admin'){
+
+        if (req.user.role === 'admin') {
             [bill] = await conn.query(`SELECT * FROM bill`);
-        }else{
-            [bill] = await conn.query(`SELECT * FROM bill WHERE room_num = ?`, [id]);
+        } else {
+            [bill] = await conn.query(`SELECT * FROM bill WHERE room_num = ?`, [room]);
         }
-        
+
 
         if (bill.length === 0) {
             return res.status(404).json({ message: 'No bill found for this room' });
@@ -291,7 +323,7 @@ app.get('/emails', async (req, res) => {
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
     try {
-        const response = await gmail.users.messages.list({ userId: 'me', labelIds: ['IMPORTANT'] });
+        const response = await gmail.users.messages.list({ userId: 'me' });
         const messages = response.data.messages;
 
         const emailDetails = await Promise.all(messages.map(async (message) => {
@@ -454,7 +486,7 @@ app.post('/login', async (req, res) => {
         if (result.length === 0) {
             return res.status(400).json({
                 message: 'Login Fail',
-                errors: ['Wrong Email, Password']
+                errors: ['อีเมล์ หรือ รหัสผ่านไม่ถูกต้อง']
             });
         }
 
@@ -569,12 +601,12 @@ app.post('/generateQR', async (req, res) => {
     }
 });
 
-app.post('/cancelQueue', (req, res) => {
+app.post(`/cancelQueue`, (req, res) => {
     const { bill_id } = req.body;
-    // ค้นหาและลบคิว QR ของผู้ใช้
     const index = pendingQRRequests.findIndex(request => request.bill_id === bill_id);
     if (index !== -1) {
         pendingQRRequests.splice(index, 1);
+        console.log(`Index ${index} cancelled successfully`)
         res.status(200).json({ message: 'Queue cancelled successfully' });
     } else {
         res.status(404).json({ message: 'Queue not found' });
@@ -610,6 +642,73 @@ app.get('/poll', (req, res) => {
     }
 });
 
+// Endpoint สำหรับตรวจสอบสลิป
+app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (req, res) => {
+    let id = req.params.id
+    const room = req.user.room
+    const { data, url } = req.body;
+    const file = req.file;
+
+    const [rows] = await conn.query(
+        `SELECT * FROM bill WHERE bill_id = ? AND status = 'pending'`,
+        [id]
+    );
+
+    if (!rows.length > 0){
+        return res.json({message: "fail"})
+    }
+
+    // ตรวจสอบว่าได้รับข้อมูลแบบใดบ้าง
+    if (!data && !file && !url) {
+        return res.status(400).json({ error: 'Either data, file, or url must be provided.' });
+    }
+
+    // สร้าง formData สำหรับส่งคำขอไปยัง API ภายนอก
+    const formData = new FormData();
+
+    if (data) {
+        formData.append('data', data);
+    } else if (file) {
+        formData.append('files', file.buffer, {
+            filename: file.originalname,
+            contentType: file.mimetype,
+        });
+    } else if (url) {
+        formData.append('url', url);
+    }
+
+    // ตั้ง log ให้เป็น true เสมอ
+    formData.append('log', 'true');
+
+    try {
+        // ส่งคำขอไปยัง API ภายนอกด้วย axios
+        const response = await axios.post('https://api.slipok.com/api/line/apikey/25333', formData, {
+            headers: {
+                'x-authorization': 'SLIPOKKJCXJTN',
+                ...formData.getHeaders(), // ใช้เพื่อให้ Axios ตั้งค่า header สำหรับ multipart/form-data ได้ถูกต้อง
+            },
+        });
+
+        const [results] = await conn.query(
+            `UPDATE bill SET status = 'success', reference_id = ?, update_at = CURRENT_TIMESTAMP WHERE bill_id = ?`,
+            [response.data.data.transRef, rows[0].bill_id]
+        )
+
+        res.status(response.status).json({
+            message: "success",
+            detail : response.data.request
+        });
+    } catch (error) {
+        console.error('Error sending request to external API:', error.response.data.message);
+        res.status(error.response ? error.response.status : 500).json(error.response.data.message);
+    }
+});
+
+app.post('/test', (req, res)=>{
+    res.json({
+        message : "hapi",
+    })
+})
 
 // Start the server
 app.listen(PORT, async () => {

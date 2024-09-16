@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Styled Dropdown List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap">
+    <style>
+        /* สไตล์ของ dropdown container */
+        .dropdown {
+            padding: 15px;
+            position: absolute;
+            display: inline-block;
+            z-index: 9000;
+            /* Set a lower z-index to ensure it's below the navbar */
+            cursor: pointer;
+            top: 10%;
+            /* Adjust based on the height of your navbar */
+        }
+
+        /* สไตล์ของ dropdown button */
+        .dropdown button {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, #7cd1ff81 10%, #004367 100%);
+            color: white;
+            padding: 12px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* สไตล์ของ dropdown content */
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(249, 249, 249, 0.0);
+            min-width: 160px;
+            z-index: 1;
+            border-radius: 8px;
+            padding: 8px;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* สไตล์ของ dropdown content items */
+        .dropdown-content a {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(to right, rgba(133, 173, 248, 0.3), rgba(2, 10, 69, 0.5));
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* สไตล์ของ dropdown content items เมื่อ hover */
+        .dropdown-content a:hover {
+            background-color: #f1f1f1;
+        }
+
+        /* แสดง dropdown content เมื่อ hover บน dropdown */
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+
+        .flex-container {
+            display: flex;
+        }
+
+        .left {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body,
+        html {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .bill-details {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            align-items: flex-start;
+            background: linear-gradient(to right, #2EA5E4 70%, #5AC5FD 100%);
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #0086CD;
+            border-radius: 8px;
+            width: 25%;
+            margin-bottom: 8px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .textarea-container {
+
+            display: flex;
+            width: 94%;
+            border-radius: 8px;
+            border: 1px solid #ffffff;
+            box-sizing: border-box;
+            padding: 8px;
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .textarea-container .left-column,
+        .textarea-container .right-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .textarea-container textarea {
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            height: 150px;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            box-sizing: border-box;
+            background: none;
+        }
+
+        .payment-container {
+            box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            width: 90%;
+            margin-top: 8px;
+        }
+
+        .payment-amount2 {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            display: flex;
+            background-color: #ffffff;
+            color: rgb(0, 0, 0);
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            position: relative;
+            z-index: 1;
+            width: 100%;
+        }
+
+        .payment-amount {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            white-space: nowrap;
+            text-align: center;
+            background: linear-gradient(to right, #2EA5E4 70%, #5AC5FD 100%);
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #0086CD;
+            border-radius: 8px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 20%;
+            z-index: 2;
+        }
+
+        .gradient-background {
+            position: absolute;
+            bottom: 0;
+            width: 50%;
+
+            background: linear-gradient(to bottom, #ffffff00, #76d4fa);
+            /* ปรับ gradient ตามที่คุณต้องการ */
+            z-index: 1;
+            /* ทำให้ gradient อยู่ด้านหลังเนื้อหา */
+        }
+
+        #disableHover {
+            opacity: 1;
+            /* ความโปร่งใสเริ่มต้น */
+            transition: opacity 0.3s ease;
+            /* การเปลี่ยนแปลงความโปร่งใส */
+            padding: 10px;
+
+            border-radius: 8px;
+            width: 200px;
+            text-align: center;
+        }
+
+        #disableHover.hidden {
+            opacity: 0;
+            /* ความโปร่งใสเมื่อซ่อน */
+        }
+
+
+        .graphic-background {
+            bottom: 0;
+            right: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #4a90e2;
+            clip-path: inset(10% 20% 30% 40%);
+            transform: rotate(115deg);
+            transform-origin: center;
+        }
+
+        .cont {
+            position: absolute;
+            bottom: -200px;
+            right: -220px;
+            width: 100px;
+            /* กำหนดขนาดตามที่ต้องการ */
+            height: 300px;
+            /* กำหนดขนาดตามที่ต้องการ */
+        }
+
+        .shape1 {
+            width: 35px;
+            height: 570px;
+            background-color: #004367;
+            /* สีฟ้า */
+            position: absolute;
+            bottom: -150px;
+            left: -330px;
+            transform: rotate(195deg);
+            z-index: 5;
+            clip-path: polygon(0 0, 100% 0, 100% 97%, 0% 100%, 0% 100%);
+        }
+
+        .shape2 {
+            width: 300px;
+            height: 350px;
+            background-color: #2EA5E4;
+            /* สีฟ้า */
+            position: absolute;
+            bottom: 0px;
+            right: 0;
+            transform: rotate(195deg);
+            z-index: 4;
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 70% 100%, 0% 100%);
+        }
+
+        .shape3 {
+            width: 300px;
+            height: 600px;
+            background-color: #004367;
+            /* สีฟ้า */
+            position: absolute;
+            bottom: 0px;
+            right: 0;
+            transform: rotate(195deg);
+            z-index: 3;
+        }
+
+        .navbar {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+            top: 0;
+            background-color: #fdfdfd;
+            display: flex;
+            margin-right: 10px;
+            justify-content: space-between;
+            align-items: center;
+            color: rgb(10, 10, 10);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            height: 8%;
+        }
+
+        .navbar .left-nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            margin-left: 100px;
+        }
+
+        .navbar .left-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .navbar .left-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .footer {
+            background-color: #004367;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+            height: 3%;
+            z-index: 9000;
+        }
+
+        .footer .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer .footer-content p {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .footer .footer-content a {
+            color: #00bcd4;
+            text-decoration: none;
+        }
+
+        .footer .footer-content a:hover {
+            text-decoration: underline;
+        }
+
+        .footer .footer-content .social-icons {
+            margin-top: 10px;
+        }
+
+        .footer .footer-content .social-icons a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 20px;
+        }
+
+        .footer .footer-content .social-icons a:hover {
+            color: #00bcd4;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            /* เบลอพื้นหลัง */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            /* ให้ Pop-up อยู่เหนือเนื้อหาอื่น */
+            visibility: visible;
+            /* แสดง Pop-up เริ่มต้น */
+            opacity: 1;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .loading-overlay.hidden {
+            visibility: hidden;
+            opacity: 0;
+        }
+
+        .loading-popup {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .spinner {
+            border: 8px solid #f3f3f3;
+            /* สีพื้นหลัง */
+            border-top: 8px solid #3498db;
+            /* สีของวงกลมหมุน */
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        p {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box" style="display: none;
+                height: 100%;
+                width: 100%;">
+        <div class="navbar">
+            <div class="left-nav">
+                <a href="#home">Home</a>
+                <a href="#service">Service</a>
+                <a href="#feature">Feature</a>
+                <a href="#product">Product</a>
+                <a href="#faq">FAQ</a>
+            </div>
+            <div class="right-nav">
+                <a href="#signin">Sign In</a>
+                <a href="#signup" style="background-color: #186a99; color: #f1f1f1;">Sign Up</a>
+            </div>
+        </div>
+        <div class="cont">
+            <div class="shape1"></div>
+            <div class="shape2"></div>
+            <div class="shape3"></div>
+
+        </div>
+        <div style="height: 100%;">
+            <div class="flex-container" style="height: 100%;">
+                <div id="hideButton" class="dropdown">
+                    <button>ช่องทางการชำระเงิน</button>
+                    <div class="dropdown-content">
+                        <a href="#">Link 1</a>
+                        <a href="#">Link 2</a>
+                        <a href="#">Link 3</a>
+                    </div>
+                </div>
+                <div class="left" style="background-image: url('picture/Bgleft.png'); background-size: cover; background-position: center; 
+                    background-repeat: no-repeat; 
+                    width: 100%; 
+                    height: 100vh; 
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;">
+                    <div id="disableHover"
+                        style="width: 70%; display: flex; flex-direction: column; align-items: flex-start; z-index: 5;">
+                        <div class="bill-details">
+                            รายละเอียดบิล
+                        </div>
+                        <div class="textarea-container" style="background-color: #ffffff;">
+                            <div class="left-column">
+                                <textarea readonly>- ค่าเช่าห้อง
+    - ค่าน้ำ
+    - ค่าไฟ
+    </textarea>
+                            </div>
+                            <div class="right-column">
+                                <textarea id="detail" readonly>3200
+    20
+    300
+    </textarea>
+                            </div>
+                        </div>
+                        <div class="payment-container">
+                            <div class="payment-amount2">
+                                <div style="flex: 15%;">
+                                </div>
+                                <div id="total_amount" style="flex: 85%; text-align: center; color: black;">
+                                </div>
+                            </div>
+                            <div class="payment-amount">
+                                ยอดชำระ
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gradient-background" style="left: 0; height: 65%;"></div>
+                </div>
+                <div class="right" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
+                    <div style="width: 50%; display: flex; flex-direction: column; align-items: center; z-index: 9100;">
+                        <div style="width: 100%;">
+                            <img id="https://via.placeholder.com/500x500" style="width: 100%; object-fit: contain;">
+                            <button id="QrButton"
+                                style="background: #2EA5E4; color: white; padding: 16px; font-size: 20px; border: none; cursor: pointer; width: 100%; border-radius: 8px; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);"
+                                onclick="genQR()">คลิกเพื่อสร้าง QrCode</button>
+                            <div id="timerElement" style="text-align: center; margin-top: 10px; display: none;">
+                                เวลาที่เหลือ : 03:00
+                            </div>
+                        </div>
+                    </div>
+                    <div class="gradient-background" style="right: 0; height: 15%;"></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-content">
+                <p>&copy; 2024 Your Company. All rights reserved.</p>
+                <p>
+                    <a href="#privacy">Privacy Policy</a> |
+                    <a href="#terms">Terms of Service</a>
+                </p>
+                <div class="social-icons">
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-popup">
+            <div class="spinner"></div>
+            <p>Loading</p>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.js"
+        integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const BASE_URL = 'http://localhost:8000';
+
+        window.addEventListener('beforeunload', async () => {
+            console.log("delete queue")
+            const urlParams = new URLSearchParams(window.location.search);
+            const billId = urlParams.get('bill_id');
+            try {
+                const response = await axios.post(`${BASE_URL}/cancelQueue`, {
+                    billId
+                }, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log(response.message)
+            } catch (error) {
+                console.log(error.message)
+            }
+
+        })
+
+    </script>
+</body>
+
+</html>

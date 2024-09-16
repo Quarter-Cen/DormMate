@@ -431,6 +431,7 @@
             pointer-events: none;
             /* ป้องกันไม่ให้คลิกบนวงกลม */
             z-index: -1;
+            transform: translate(-50%) rotate(45deg);
         }
 
         #background-circle4 {
@@ -511,7 +512,8 @@
 </head>
 
 <body>
-    <div class="navbar">
+    <div class="box" style="width: 100%; height: 100%; display: none; ">
+<div class="navbar">
         <div class="left-nav">
             <a href="#home">Home</a>
             <a href="#service">Service</a>
@@ -576,6 +578,8 @@
             </div>
         </div>
     </div>
+    </div>
+    
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-popup">
             <div class="spinner"></div>
