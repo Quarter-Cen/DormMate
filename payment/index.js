@@ -4,7 +4,7 @@ const BASE_URL = 'http://localhost:8000';
 window.onload = async () => {
     const authToken = sessionStorage.getItem('token');
 
-     if ( !authToken) {
+     if (!authToken) {
         console.error('Token not found in sessionStorage');
         window.location.href = `${BASE_URL}/login.html`;
         return;
@@ -131,6 +131,7 @@ window.onload = async () => {
         console.error('Error:', error.response?.data?.message || error.message);
 
         if (error.response?.data?.message === 'Invalid or expired token') {
+            sessionStorage.removeItem('token');
             window.location.href = `${BASE_URL}/login.html`;
         }
 
@@ -211,4 +212,11 @@ document.getElementById('bill-details').addEventListener('scroll', function () {
     circles.forEach(circle => {
         circle.style.transform = `translate(${-scrollLeft}px, ${-scrollTop}px)`;
     });
+});
+
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        // ถ้าเกิดจากการใช้ Go Back หรือ Go Forward
+        window.location.reload(); // Refresh หน้าทันที
+    }
 });

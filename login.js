@@ -1,5 +1,15 @@
 const BASE_URL = 'http://localhost:8000';
 
+const toggle = () => {
+  const inputElement = document.getElementById("password");
+  if(inputElement.type == "text"){
+    inputElement.type = "password";
+  } else {
+    inputElement.type = "text";
+  }
+  
+}
+
 const checkLoginStatus = () => {
   if (sessionStorage.getItem('token')) {
     window.location.href = '/payment';

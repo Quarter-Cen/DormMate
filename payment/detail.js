@@ -171,6 +171,7 @@ window.onload = async () => {
         console.error('Error:', error);
         document.querySelector('.bill-details').innerText = 'Error fetching bill details';
         if (error.response?.data?.message === 'Invalid or expired token') {
+            sessionStorage.removeItem('token');
             window.location.href = `${BASE_URL}/login.html`;
         }
     }
@@ -205,4 +206,11 @@ document.addEventListener("DOMContentLoaded", function () {
         hideOverlay();
         sessionStorage.removeItem(overlayVisibleKey);
     });
+});
+
+window.addEventListener('pageshow', function(event) {
+    if (event.persisted) {
+        // ถ้าเกิดจากการใช้ Go Back หรือ Go Forward
+        window.location.reload(); // Refresh หน้าทันที
+    }
 });

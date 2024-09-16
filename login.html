@@ -50,7 +50,7 @@
   }
 
   .login-container input[type="email"],
-  .login-container input[type="password"] {
+  .login-container input[id="password"] {
       width: 100%;
       padding: 12px;
       margin: 8px 0;
@@ -68,6 +68,7 @@
       right: 10px;
       top: 12px;
       cursor: pointer;
+      user-select: none;
   }
 
   .login-container input[type="submit"] {
@@ -133,8 +134,8 @@
       
       <p>Password</p>
       <div class="password-container">
-          <input type="password" name="password" required>
-          <span class="toggle-password">#</span>
+          <input type="password" name="password" id="password" required>
+          <span class="toggle-password" id="toggle-password" onclick="toggle()">#</span>
       </div>
       <div id="password-error-button-container" style="color: red; display: none; text-align: start; margin-bottom: 4px;">กรุณากรอกรหัสผ่าน</div>
       <div id="login-fail-button-container" style="color: red; display: none; text-align: end;"></div>

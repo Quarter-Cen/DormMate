@@ -76,7 +76,6 @@ const authenticateToken = async (req, res, next) => {
     try {
         const user = jwt.verify(authToken, SECRET);
         req.user = user;
-
         // Execute the query to find user's room and role
         const [result] = await conn.query(`SELECT * FROM user_rooms WHERE user_id = ?`, [req.user.id]);
 
@@ -86,7 +85,6 @@ const authenticateToken = async (req, res, next) => {
         } else {
             return res.status(403).json({ message: 'User has no assigned room or role' });
         }
-
         next(); // Continue to the next middleware or route handler
     } catch (err) {
         // Handle token verification error
@@ -646,8 +644,10 @@ app.get('/poll', (req, res) => {
 app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (req, res) => {
     let id = req.params.id
     const room = req.user.room
-    const { data, url } = req.body;
+
     const file = req.file;
+    
+    console.log(id)
 
     const [rows] = await conn.query(
         `SELECT * FROM bill WHERE bill_id = ? AND status = 'pending'`,
@@ -659,23 +659,20 @@ app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (re
     }
 
     // ตรวจสอบว่าได้รับข้อมูลแบบใดบ้าง
-    if (!data && !file && !url) {
+    if (!file) {
         return res.status(400).json({ error: 'Either data, file, or url must be provided.' });
     }
 
     // สร้าง formData สำหรับส่งคำขอไปยัง API ภายนอก
     const formData = new FormData();
 
-    if (data) {
-        formData.append('data', data);
-    } else if (file) {
+
+    if (file) {
         formData.append('files', file.buffer, {
             filename: file.originalname,
             contentType: file.mimetype,
         });
-    } else if (url) {
-        formData.append('url', url);
-    }
+
 
     // ตั้ง log ให้เป็น true เสมอ
     formData.append('log', 'true');
@@ -702,7 +699,7 @@ app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (re
         console.error('Error sending request to external API:', error.response.data.message);
         res.status(error.response ? error.response.status : 500).json(error.response.data.message);
     }
-});
+}});
 
 app.post('/test', (req, res)=>{
     res.json({

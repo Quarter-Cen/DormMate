@@ -107,14 +107,13 @@
         .bill-details {
             text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
             text-align: center;
-            align-items: flex-start;
-            background: linear-gradient(to right, #2EA5E4 70%, #5AC5FD 100%);
+            align-items: center;
+            background: linear-gradient(to left, #2ea4e46e 1%, #5AC5FD 100%);
             color: white;
-            padding: 10px;
-            font-size: 16px;
+            padding: 6px;
+            font-size: 8px;
             border: 1px solid #0086CD;
             border-radius: 8px;
-            width: 25%;
             margin-bottom: 8px;
             box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
         }
@@ -149,10 +148,18 @@
         }
 
         .payment-container {
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            align-items: center;
+            background: linear-gradient(to right, #2EA5E4 70%, #5AC5FD 100%);
+            color: white;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #0086CD;
+            border-radius: 8px;
+            width: 50%;
+            margin-bottom: 8px;
             box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.3);
-            position: relative;
-            width: 90%;
-            margin-top: 8px;
         }
 
         .payment-amount2 {
@@ -463,9 +470,7 @@
                 <div id="hideButton" class="dropdown">
                     <button>ช่องทางการชำระเงิน</button>
                     <div class="dropdown-content">
-                        <a href="#">Link 1</a>
-                        <a href="#">Link 2</a>
-                        <a href="#">Link 3</a>
+                        <a onclick="linkToQR()">ชำระผ่านการโอน</a>
                     </div>
                 </div>
                 <div class="left" style="background-image: url('picture/Bgleft.png'); background-size: cover; background-position: center; 
@@ -476,48 +481,26 @@
                     justify-content: center;
                     align-items: center;">
                     <div id="disableHover"
-                        style="width: 70%; display: flex; flex-direction: column; align-items: flex-start; z-index: 5;">
+                        style="width: 70%; display: flex; flex-direction: column; align-items: center; z-index: 5;">
                         <div class="bill-details">
-                            รายละเอียดบิล
+                            <input type="file" id="imageUpload" accept="image/*" />
                         </div>
-                        <div class="textarea-container" style="background-color: #ffffff;">
-                            <div class="left-column">
-                                <textarea readonly>- ค่าเช่าห้อง
-    - ค่าน้ำ
-    - ค่าไฟ
-    </textarea>
-                            </div>
-                            <div class="right-column">
-                                <textarea id="detail" readonly>3200
-    20
-    300
-    </textarea>
-                            </div>
+
+                        <div id="imagePreview" class="pre-view" style="margin-top: 10px; margin-bottom: 10px;">
                         </div>
-                        <div class="payment-container">
-                            <div class="payment-amount2">
-                                <div style="flex: 15%;">
-                                </div>
-                                <div id="total_amount" style="flex: 85%; text-align: center; color: black;">
-                                </div>
-                            </div>
-                            <div class="payment-amount">
-                                ยอดชำระ
-                            </div>
+
+                        <div class="payment-container" id="imageSend" style="display: none; cursor: pointer;" onclick="sendSlip()">
+                                อัปโหลดไฟล์
                         </div>
+
+                        
                     </div>
                     <div class="gradient-background" style="left: 0; height: 65%;"></div>
                 </div>
                 <div class="right" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
-                    <div style="width: 50%; display: flex; flex-direction: column; align-items: center; z-index: 9100;">
-                        <div style="width: 100%;">
-                            <img id="https://via.placeholder.com/500x500" style="width: 100%; object-fit: contain;">
-                            <button id="QrButton"
-                                style="background: #2EA5E4; color: white; padding: 16px; font-size: 20px; border: none; cursor: pointer; width: 100%; border-radius: 8px; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);"
-                                onclick="genQR()">คลิกเพื่อสร้าง QrCode</button>
-                            <div id="timerElement" style="text-align: center; margin-top: 10px; display: none;">
-                                เวลาที่เหลือ : 03:00
-                            </div>
+                    <div style="width: 60%;  align-items: center; z-index: 9100;">
+                        <div style=" align-items: center;">
+                            <img src="./picture/card.svg" style="width: 100%; object-fit: contain;">
                         </div>
                     </div>
                     <div class="gradient-background" style="right: 0; height: 15%;"></div>
@@ -549,29 +532,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.js"
         integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script>
-        const BASE_URL = 'http://localhost:8000';
-
-        window.addEventListener('beforeunload', async () => {
-            console.log("delete queue")
-            const urlParams = new URLSearchParams(window.location.search);
-            const billId = urlParams.get('bill_id');
-            try {
-                const response = await axios.post(`${BASE_URL}/cancelQueue`, {
-                    billId
-                }, {
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                });
-                console.log(response.message)
-            } catch (error) {
-                console.log(error.message)
-            }
-
-        })
-
-    </script>
+    <script src="index.js"></script>
+    
 </body>
 
 </html>

@@ -2,11 +2,10 @@ const BASE_URL = 'http://localhost:8000';
 
 const urlParams = new URLSearchParams(window.location.search);
 const billId = urlParams.get('bill_id');
+const authToken = sessionStorage.getItem('token');
 
-// ทำการลบคิวเมื่อผู้ใช้ออกจากหน้า
 window.addEventListener('beforeunload', async () => {
     console.log("delete queue")
-
     try {
         const response = await axios.post(`${BASE_URL}/cancelQueue`, {
             billId
@@ -21,8 +20,11 @@ window.addEventListener('beforeunload', async () => {
     }
 
 })
+
+
+
+
 window.onload = async () => {
-    const authToken = sessionStorage.getItem('token');
 
 
     if (!authToken) {
@@ -69,28 +71,6 @@ window.onload = async () => {
         </div>`;
         
         const content = document.querySelector('.box');
-        console.log(content)
-        const response = await axios.get(`${BASE_URL}/getBillDetails/${billId}`, {
-            headers: {
-                'authorization': `Bearer ${authToken}`
-            }
-        });
-
-        const bill = response.data;
-
-        const textarea = document.querySelector('#detail');
-        const totalAmountElement = document.querySelector('#total_amount');
-        const electricTotal = (bill.cur_elect - bill.pre_elect) * 8;
-        const waterTotal = (bill.cur_water - bill.pre_water) * 35;
-        let roomPrice = 0;
-        if (bill.room_type === 'big') {
-            roomPrice += 3200;
-        } else {
-            roomPrice += 2800;
-        }
-
-        textarea.value = `${roomPrice}\n${electricTotal}\n${waterTotal}`;
-        totalAmountElement.textContent = `${bill.amount} บาท`;
         content.style.display = 'block';
 
     } catch (error) {
@@ -107,6 +87,28 @@ window.onload = async () => {
         }
     }
 };
+
+document.getElementById('imageUpload').addEventListener('change', function (event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const imgPreview = document.createElement('img');
+            imgPreview.src = e.target.result;
+            imgPreview.style.width = '300px'; // Adjust image size as needed
+            imgPreview.style.height = 'auto';
+            
+            const previewContainer = document.getElementById('imagePreview');
+            previewContainer.innerHTML = ''; // Clear previous preview if any
+            previewContainer.appendChild(imgPreview); // Append the new image
+        };
+
+        const imageSend = document.getElementById('imageSend');
+        imageSend.style.display = 'block'
+
+        reader.readAsDataURL(file); // Convert the file to a data URL
+    }
+});
 
 const button = document.getElementById('hideButton');
     const disableHover = document.getElementById('disableHover');
@@ -126,74 +128,6 @@ const button = document.getElementById('hideButton');
 // ใช้ mouseover เพื่อตั้งค่าให้ฟังก์ชันทำงานเมื่อเมาส์อยู่เหนือปุ่ม
 button.addEventListener('mouseover', nevigator);
 button.addEventListener('mouseout', nevigator2);
-function genQR() {
-    // ดึงค่า bill_id จาก URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const billId = urlParams.get('bill_id');
-
-    console.log(billId);
-    // ใช้ billId ในคำขอ POST
-    $.ajax({
-        method: 'POST',
-        url: 'http://localhost:8000/generateQR',
-        contentType: 'application/json', // กำหนด Content-Type เป็น JSON
-        data: JSON.stringify({
-            bill_id: billId
-        }),
-        success: function(response) {
-            console.log('good', response);
-            $("#imgQR").attr('src', response.Result);
-            startCountdown()
-            pollForAdminRes()
-        },
-        error: function(err) {
-            console.log('bad', err);
-        }
-    });
-}
-
-let countdownInterval;
-
-function startCountdown() {
-    let remainingTime = 180;
-
-    const updateTimer = () => {
-      const minutes = Math.floor(remainingTime / 60);
-      const seconds = remainingTime % 60;
-      QrButton.style.display = 'none'
-      timerElement.textContent = `เวลาที่เหลือ : ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      timerElement.style.display = 'block'
-      if (remainingTime <= 0) {
-        clearInterval(countdownInterval);
-      } else {
-        remainingTime--;
-      }
-    };
-
-    updateTimer();
-    countdownInterval = setInterval(updateTimer, 1000);
-  }
-
-
-
-
-async function pollForAdminRes() {
-    try {
-        const response = await fetch('http://localhost:8000/wait-admin');
-        const data = await response.json();
-        if (data.message) {
-            alert(data.message);
-            window.location.href = `http://localhost:8000/payment/detail.html?id=${data.bill_id}`
-            return
-        }
-   
-        // ทำการ polling ต่อไป
-        setTimeout(pollForAdminRes, 1000); // Polling interval
-    } catch (error) {
-        console.error('Polling error:', error);
-        setTimeout(pollForAdminRes, 5000); // Retry after 5 seconds
-    }
-  }
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -232,8 +166,42 @@ window.addEventListener('pageshow', function(event) {
     }
 });
 
-const linkToTFB = () => {
-    window.location.replace(`../TransferByBanking/index.html?bill_id=${billId}`)
+
+const sendSlip = async () => {
+    const slipInput = document.getElementById('imageUpload'); // รับไฟล์จาก input
+    const formData = new FormData();
+
+    if (slipInput.files.length > 0) {
+        formData.append('files', slipInput.files[0]); // เพิ่มไฟล์ไปใน FormData (ชื่อควรตรงกับ back-end)
+        try {
+            // แก้ไข URL ไม่ต้องใช้ ':'
+            const response = await axios.post(`${BASE_URL}/slip-check/${billId}`, formData, {
+                headers: {
+                    'authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'multipart/form-data', // axios จะตั้งค่าให้ แต่ระบุเพื่อความชัดเจน
+                    
+                },
+            });
+
+            if (response.data.message === "success") {
+                alert('อัปโหลดสลิปสำเร็จ');
+                window.location.replace = `http://localhost:8000/payment/detail.html?id=${billId}`
+                console.log("finish")
+            } else {
+                alert('เกิดข้อผิดพลาดในการอัปโหลด: ' + response.data.message);
+            }
+        } catch (error) {
+            console.error('เกิดข้อผิดพลาด:', error.response?.data || error.message);
+            alert('เกิดข้อผิดพลาด: ' + (error.response?.data || error.message));
+        }
+    } else {
+        alert('กรุณาเลือกไฟล์');
+    }
+};
+
+
+const linkToQR = () => {
+    window.location.replace(`../Qrcode/index.html?bill_id=${billId}`)
 }
 
 window.addEventListener('pageshow', function(event) {
