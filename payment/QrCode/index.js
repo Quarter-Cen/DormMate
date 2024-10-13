@@ -41,7 +41,7 @@ window.onload = async () => {
             }
         });
 
-        const user = userResponse.data[0];
+        const user = userResponse.data.results[0];
 
         // Update the navbar with user's full name
         const rightNav = document.querySelector('.right-nav');
@@ -80,17 +80,17 @@ window.onload = async () => {
 
         const textarea = document.querySelector('#detail');
         const totalAmountElement = document.querySelector('#total_amount');
-        const electricTotal = (bill.cur_elect - bill.pre_elect) * 8;
-        const waterTotal = (bill.cur_water - bill.pre_water) * 35;
+        const electricTotal = ((bill.last_elec - bill.previous_elec) * 8).toFixed(2);
+        const waterTotal = ((bill.last_water - bill.previous_water) * 10).toFixed(2);
         let roomPrice = 0;
-        if (bill.room_type === 'big') {
-            roomPrice += 3200;
+        if (bill.type === 'big') {
+            roomPrice += 3200.00;
         } else {
-            roomPrice += 2800;
+            roomPrice += 2800.00;
         }
-
+        roomPrice = (roomPrice).toFixed(2)
         textarea.value = `${roomPrice}\n${electricTotal}\n${waterTotal}`;
-        totalAmountElement.textContent = `${bill.amount} บาท`;
+        totalAmountElement.textContent = `${bill.total_amount} บาท`;
         content.style.display = 'block';
 
     } catch (error) {
@@ -103,7 +103,9 @@ window.onload = async () => {
         } else if (error.response?.data?.message === 'Access denied') {
             window.location.replace(`http://localhost:8000/payment/?id=${error.response.data.UID}`);
         } else {
+            alert(error.response.data.message)
             document.body.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+            window.location.replace(`http://localhost:8000/payment/?id=${error.response.data.UID}`);
         }
     }
 };

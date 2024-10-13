@@ -1,99 +1,359 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <!-- ส่วนที่ไม่แสดงออกไปในหน้าจอของ Browser -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document 2</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Water & Electricity Usage</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+
+    body {
+      margin: 0;
+      display: block;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      background-image: url('img/home\ user\,\ admin.svg');
+    }
+
+    .navbar {
+      position: fixed;
+      width: 100%;
+      top: 0;
+      background-color: #fdfdfd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: rgb(10, 10, 10);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      height: 8%;
+    }
+
+    .navbar .left-nav {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      padding-left: 20px;
+    }
+
+    .navbar .middle-section {
+      flex: 1;
+      align-items: center;
+    }
+
+    .navbar .middle-section a {
+      color: rgb(10, 10, 10);
+      text-decoration: none;
+      padding: 20px 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .navbar .middle-section a:hover {
+      background-color: #d3d3d3;
+      border-radius: 4px;
+    }
+
+    .navbar .right-nav {
+      flex: 1;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      padding-right: 20px;
+      position: relative;
+    }
+
+    .navbar .right-nav a {
+      color: rgb(10, 10, 10);
+      text-decoration: none;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+
+    .navbar .right-nav a:hover {
+      background-color: #d3d3d3;
+      border-radius: 4px;
+    }
+
+    .navbar-logo {
+      height: 40px;
+      margin-right: 20px;
+    }
+
+    .Profile-logo {
+      width: 60px;
+      border-radius: 50%;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 30px;
+      top: 60px;
+      background-color: white;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 5px;
+      z-index: 5000;
+      width: 150px;
+    }
+
+    .dropdown-content a {
+      padding: 10px 20px;
+      display: block;
+      text-decoration: none;
+      color: black;
+      border-bottom: 1px solid #f1f1f1;
+    }
+
+    .dropdown-content a:hover {
+      background-color: #d3d3d3;
+    }
+
+    .dropdown-content a:last-child {
+      border-bottom: none;
+    }
+
+    .content {
+      display: block;
+      padding: 20px;
+      margin-top: 50px;
+      gap: 20px;
+    }
+
+    .sidebar {
+      width: 20%;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: start;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 20px;
+      color: #3b82f6;
+      text-align: center;
+    }
+
+    .sidebar p {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .sidebar button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
+    .chart-section {
+      margin-left: 25%;
+      width: 50%;
+      background-color: #fff;
+      border-radius: 10px;
+    }
+
+    .chart-section h2 {
+      text-align: center;
+      color: #3b82f6;
+      margin-bottom: 20px;
+    }
+
+    .chart-container {
+      display: flex;
+      justify-content: center;
+    }
+
+    canvas {
+      width: 200px;
+      height: 1000px;
+    }
+
+    .issue-box {
+      background-color: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      width: 350px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .issue-header {
+      background-color: #2a475e;
+      color: white;
+      padding: 10px;
+      border-radius: 5px 5px 0 0;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+
+    .issue-list {
+      text-align: left;
+      color: #333;
+      line-height: 1.8;
+    }
+
+    .issue-list li {
+      margin: 5px 0;
+    }
+
+    .details-button {
+      background-color: #0066cc;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      cursor: pointer;
+    }
+
+    .details-button:hover {
+      background-color: #0052a3;
+    }
+
+    /* Styles for the footer */
+    .footer {
+      margin-top: 30px;
+      background-color: #004367;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      bottom: 0;
+      width: 100%;
+      left: 0;
+      height: 3%;
+    }
+
+    .footer .footer-content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .footer .footer-content p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    .footer .footer-content a {
+      color: #00bcd4;
+      text-decoration: none;
+    }
+
+    .footer .footer-content a:hover {
+      text-decoration: underline;
+    }
+
+    .footer .footer-content .social-icons {
+      margin-top: 10px;
+    }
+
+    .footer .footer-content .social-icons a {
+      color: white;
+      text-decoration: none;
+      margin: 0 10px;
+      font-size: 20px;
+    }
+
+    .footer .footer-content .social-icons a:hover {
+      color: #00bcd4;
+    }
+  </style>
 </head>
+
 <body>
+  </div>
+  <div class="navbar">
+    <div class="left-nav">
+        <img src="/img/dormmate-high-resolution-logo-black-transparent.png" alt="Logo" class="navbar-logo">
 
-  <a href="user.html">Go to User Management</a>
-  <!-- ส่วนที่แสดงออกไปในหน้าจอของ Browser -->
+    </div>
+    <div class="middle-section">
+        <a href="/index.html">Home</a>
+        <a href="#service">Service</a>
+        <a href="#feature">Feature</a>
+        <a href="#product">Product</a>
+        <a href="#faq">FAQ</a>
+    </div>
+    <div class="right-nav">
+        <a href="#signin">Sign In</a>
+        <a href="#signup" style="background-color: #186a99; color: #f1f1f1;">Sign Up</a>
+    </div>
+</div>
 
-  <div class="container" style="display: none;">
-    <!-- 3. form -->
-    <div class="header form-input">
-      Register form
-    </div>
-    <div class="flex form-input">
-      <div class="header-form">ชื่อจริง</div>
-      <input class="form" name="firstname" type="text">
-    </div>
-    <div class="flex form-input">
-      <div class="header-form">นามสกุล </div>
-      <input class="form" name="lastname" type="text">
-    </div>
-    <div class="flex form-input">
-      <div class="header-form">อายุ</div>
-      <input class="form" name="age" type="number" min="0" max="100">
-    </div>
-    <div class="flex form-input">
-      <div class="header-form">Email</div>
-      <input class="form" name="email" type="text">
-    </div>
-    <div class="flex form-input">
-      <div class="header-form">รหัสผ่าน</div>
-      <input class="form" name="password" type="password">
-    </div>
-    <div class="flex gender form-input">
-      <div class="header-form">เพศ</div>
-      <div class="flex">
-        <div>
-          <input name="gender" type="radio" value="ชาย"> ชาย
-        </div>
-        <div>
-          <input name="gender" type="radio" value="หญิง"> หญิง
-        </div>
-        <div>
-          <input name="gender" type="radio" value="ไม่ระบุ"> ไม่ระบุ
-        </div>
+  <!-- Main Content -->
+  <div class="content">
+    <div style="display: flex; height: 100%;">    <!-- Sidebar Section -->
+      <div class="sidebar"></div>
+      <div id="adminOnly" style="justify-content: center; padding: 50px; display: none;">
+        <a href="adminManage/"><button>จัดการสมาชิก</button></a>
+        <a href="adminManage/rooms/"><button>จัดการห้อง</button></a>
       </div>
     </div>
-    <div class="form-input">
-      สิ่งที่สนใจ
-      <div>
-        <input name="interest" type="checkbox" value="หนังสือ"> หนังสือ
-      </div>
-      <div>
-        <i name="interest_error" style="display: none; color: brown;">
-          <!-- ที่ไว้ใส่ error -->
-           กรุณาใส่ความสนใจ
-        </i>
-      </div>
-      <div>
-        <input name="interest" type="checkbox" value="วิดีโอเกม"> วิดีโอเกม
-      </div>
-      <div>
-        <input name="interest" type="checkbox" value="การเมือง"> การเมือง
-      </div>
-    </div>
-    <div class="form-input">
-      คำอธิบายตัวตนเพิ่มเติม
-      <div>
-        <textarea name="description"></textarea>
-      </div>
-    </div>
-    <div class="form-input center" >
-      <a href="https://shopee.com">T&C</a>
-    </div>
-    <div id="message" class="message">
-    </div>
-    <div class="center" style="margin-bottom: 8px;">
 
+
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <h2 id="bill-head">สถิติการใช้ไฟฟ้าและน้ำ</h2>
+      <div class="chart-container">
+        <!-- Electricity Chart -->
+        <canvas id="electricityChart"></canvas>
+        <!-- Water Chart -->
+        <canvas id="waterChart"></canvas>
+      </div>
     </div>
   </div>
 
-  <div class="container">
-    <div class="center" style="margin-top: 8px;">
-      <button onclick="submitData()" class="button">Create Bills</button>
-    </div>  
+  <div class="issue-box" style="display: none;">
+    <div class="issue-header">แจ้งปัญหา-สิ่งของชำรุด</div>
+    <ul class="issue-list">
+      <li>โต๊ะเครื่องแป้งเชื้อราขึ้น</li>
+      <li>ท่อน้ำล้างจานตัน</li>
+      <li>เพดานน้ำรั่วซึม</li>
+      <li>แอร์ไม่เย็น</li>
+      <li>พัดลมเสีย</li>
+    </ul>
+    <button class="details-button">รายละเอียด</button>
+
+
+  </div>
+  <div class="footer">
+    <div class="footer-content">
+      <p>&copy; 2024 Your Company. All rights reserved.</p>
+      <p>
+        <a href="#privacy">Privacy Policy</a> |
+        <a href="#terms">Terms of Service</a>
+      </p>
+      <div class="social-icons">
+        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+      </div>
+    </div>
   </div>
 
 
-  <script src="https://apis.google.com/js/api.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script src="index.js"></script>
 </body>
+
 </html>

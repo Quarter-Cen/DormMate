@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100vh;
+            background-color: #ffff;
+        }
+
+        /* Left form section */
+        .form-container {
+            width: 100%;
+            padding: 40px;
+            display: flex;
+
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 100px;
+        }
+
+        .form-row1 {
+            flex-grow: 1;
+        }
+
+        .form-row2 {
+            flex-grow: 1;
+        }
+
+        .form-row input {
+            width: 50%;
+        }
+
+        .small-input {
+            width: 100%;
+        }
+
+        .send-code {
+            display: inline-block;
+            width: 23%;
+            padding: 10px;
+            margin-left: 2%;
+            background-color: transparent;
+            color: #007bff;
+            border: none;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 15px;
+            width: 100%;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #005bb5;
+        }
+
+        /* Right image upload section */
+        .image-upload-container {
+            width: 50%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 261.5px;
+            background-image: url('img/ROOM4.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .image-box {
+            width: 400px;
+            height: 400px;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 60px;
+            color: #666;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .upload-btn {
+            margin-top: 40px;
+            padding: 20px 120px;
+            background-color: #004367;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-block;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .upload-btn:hover {
+            background-color: #0066cc;
+        }
+
+        .navbar {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+            top: 0;
+            background-color: #fdfdfd;
+            display: flex;
+            margin-right: 10px;
+            justify-content: space-between;
+            align-items: center;
+            color: rgb(10, 10, 10);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            height: 8%;
+        }
+
+        .navbar .left-nav {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            margin-left: 100px;
+        }
+
+        .navbar .left-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .navbar .left-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 10px 15px;
+            margin-left: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar-logo {
+            height: 40px;
+            /* ปรับขนาดของรูปตามต้องการ */
+            margin-right: 20px;
+            /* เว้นระยะระหว่างรูปกับลิงก์ */
+        }
+    </style>
+</head>
+<div class="navbar">
+    <div class="left-nav">
+        <img src="/img/dormmate-high-resolution-logo-black-transparent.png" alt="Logo" class="navbar-logo">
+    </div>
+    <div class="right-nav">
+        <a onclick="linkToSignIn()" style="background-color: #186a99; color: #f1f1f1; cursor: pointer;">Log In</a>
+    </div>
+</div>
+<div style="display: flex; height: 100%;">
+    <div style="display: flex; flex-direction: column; width: 50%; align-items: center;">
+        <div>
+            <h2>ลงทะเบียน</h2>
+        </div>
+        <!-- Left form section -->
+        <div class="form-container">
+
+            <div style="width: 48%; margin-right: 2%;">
+
+                <div class="form-row1">
+                    <div>
+                        <label for="firstname">ชื่อ</label>
+                        <input type="text" id="firstname">
+                    </div>
+                    <div>
+                        <label for="lastname">ชื่อเล่น</label>
+                        <input type="text" id="nickname">
+                    </div>
+                </div>
+
+
+
+                <div>
+                    <label for="gender">เพศ</label>
+                    <select id="gender">
+                        <option value="ชาย">ชาย</option>
+                        <option value="หญิง">หญิง</option>
+
+                    </select>
+                </div>
+
+                <label for="address">ที่อยู่ตามทะเบียนบ้าน</label>
+                <textarea id="address" placeholder="กรอกที่อยู่..."></textarea>
+
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="example@example.com">
+
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="รหัสผ่านควรมีความยาวมากกว่า 6 ตัวอักษร">
+
+                <label for="tel">เบอร์โทรศัพท์</label>
+                <input type="text" id="tel">
+
+            </div>
+            <div class="form-row2" style="width: 48%; margin-left: 2%;">
+                <div>
+                    <label for="nickname">นามสกุล</label>
+                    <input type="text" id="lastname">
+                </div>
+                <div>
+                    <label for="dob">วันเกิด</label>
+                    <input type="date" id="dob">
+                </div>
+            </div>
+        </div>
+        <div style="width: 50%; justify-items: center;">
+            <button type="submit" class="submit-btn">ลงทะเบียน</button>
+        </div>
+    </div>
+
+    <!-- Right image upload section -->
+    <div class="image-upload-container" style="width: 50%;">
+        <div style="align-items: center; justify-content: center;">
+            <div class="image-box" id="imageBox" style="cursor: pointer;">
+                +
+            </div>
+            <input type="file" id="fileInput" style="display: none;" accept="image/*">
+        </div>
+    </div>
+    <script src="register.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    </body>
+
+</html>

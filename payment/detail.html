@@ -25,7 +25,6 @@
             top: 0;
             background-color: #fdfdfd;
             display: flex;
-            margin-right: 10px;
             justify-content: space-between;
             align-items: center;
             color: rgb(10, 10, 10);
@@ -37,11 +36,20 @@
         .navbar .left-nav {
             flex: 1;
             display: flex;
-            justify-content: center;
-            margin-left: 100px;
+            align-items: center;
+            padding-left: 20px;
         }
 
-        .navbar .left-nav a {
+        .navbar .middle-section {
+            flex: 2;
+            /* กำหนดให้กลางกว้างกว่าส่วนอื่น */
+            display: flex;
+            justify-content: center;
+            /* จัดให้อยู่ตรงกลาง */
+            align-items: center;
+        }
+
+        .navbar .middle-section a {
             color: rgb(10, 10, 10);
             text-decoration: none;
             padding: 14px 20px;
@@ -49,17 +57,23 @@
             font-weight: bold;
         }
 
-        .navbar .left-nav a:hover {
+        .navbar .middle-section a:hover {
             background-color: #d3d3d3;
             border-radius: 4px;
+        }
+
+        .navbar .right-nav {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 20px;
         }
 
         .navbar .right-nav a {
             color: rgb(10, 10, 10);
             text-decoration: none;
             padding: 10px 15px;
-            margin-left: 10px;
-            margin-right: 10px;
             font-size: 16px;
             border-radius: 4px;
         }
@@ -67,6 +81,11 @@
         .navbar .right-nav a:hover {
             background-color: #d3d3d3;
             border-radius: 4px;
+        }
+
+        .navbar-logo {
+            height: 40px;
+            margin-right: 20px;
         }
 
         .content {
@@ -226,6 +245,13 @@
             font-size: 18px;
             color: #333;
         }
+
+        .navbar-logo {
+            height: 40px;
+            /* ปรับขนาดของรูปตามต้องการ */
+            margin-right: 20px;
+            /* เว้นระยะระหว่างรูปกับลิงก์ */
+        }
     </style>
 </head>
 
@@ -235,7 +261,11 @@
    ">
         <div class="navbar">
             <div class="left-nav">
-                <a href="#home">Home</a>
+                <img src="/img/dormmate-high-resolution-logo-black-transparent.png" alt="Logo" class="navbar-logo">
+        
+            </div>
+            <div class="middle-section">
+                <a href="/index.html">Home</a>
                 <a href="#service">Service</a>
                 <a href="#feature">Feature</a>
                 <a href="#product">Product</a>

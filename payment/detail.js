@@ -17,7 +17,7 @@ window.onload = async () => {
         window.location.href = `detail.html?id=${billId}`;
         return;
     }
-    
+
     try {
 
         const userResponse = await axios.get(`${BASE_URL}/users`, {
@@ -25,9 +25,9 @@ window.onload = async () => {
                 'authorization': `Bearer ${authToken}`
             }
         });
-    
-        const user = userResponse.data[0];
-    
+
+        const user = userResponse.data.results[0];
+
         // Update the navbar with user's full name
         const rightNav = document.querySelector('.right-nav');
         rightNav.innerHTML = `
@@ -74,10 +74,10 @@ window.onload = async () => {
         window.history.pushState({}, '', url);
 
         // Calculate totals
-        const electricTotal = (bill.cur_elect - bill.pre_elect) * 8;
-        const waterTotal = (bill.cur_water - bill.pre_water) * 35;
-        const roomPrice = bill.room_type === 'big' ? 3200 : 2800;
-
+        const electricTotal = ((bill.last_elec - bill.previous_elec) * 8).toFixed(2);
+        const waterTotal = ((bill.last_water - bill.previous_water) * 10).toFixed(2);
+        const roomPrice = (bill.room_type === 'big' ? 3200 : 2800).toFixed(2);
+        console.log(bill)
         // Determine status and colors
         const statusDetails = {
             'pending': { text: 'ยังไม่ชำระ', color: 'red' },
@@ -88,61 +88,80 @@ window.onload = async () => {
         const status = statusDetails[bill.status] || { text: 'NULL', color: 'black' };
         const refColor = bill.reference_id ? 'black' : 'gray';
         const updateColor = bill.update_at ? 'black' : 'gray';
-        const createColor = bill.timestamp ? 'black' : 'gray';
+        const createColor = bill.create_at ? 'black' : 'gray';
+
+
+
 
         // Display bill details
+        // ฟังก์ชันสำหรับแปลงวันที่เป็นรูปแบบไทย
+        function formatDateThai(dateString) {
+            if (!dateString) return 'ไม่มี'; // ถ้าไม่มีข้อมูลวันที่ ให้แสดงเป็น 'ไม่มี'
+
+            const date = new Date(dateString);
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                timeZone: 'Asia/Bangkok'
+            };
+
+            return new Intl.DateTimeFormat('th-TH', options).format(date);
+        }
+console.log(formatDateThai(bill.create_at))
         document.querySelector('.bill-details').innerHTML = `
-            <h2>รหัสใบรับเงิน/ใบแจ้งหนี้: ${bill.bill_id}</h2>
-            <p><strong>เลขที่ห้อง:</strong> ${bill.room_num}</p>
-            <p><strong>ชื่อ:</strong> คุณ${bill.name}</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>รายการ</th>
-                        <th>จดครั้งก่อน</th>
-                        <th>จดครั้งนี้</th>
-                        <th>หน่วยที่ใช้</th>
-                        <th>ราคา/หน่วย</th>
-                        <th>จำนวนเงิน</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>ค่าเช่า</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td style="text-align: end;">${roomPrice}</td>
-                    </tr>
-                    <tr>
-                        <td>ค่าไฟฟ้า</td>
-                        <td style="text-align: center;">${bill.pre_elect}</td>
-                        <td style="text-align: center;">${bill.cur_elect}</td>
-                        <td style="text-align: end;">${bill.cur_elect - bill.pre_elect}</td>
-                        <td style="text-align: end;">8</td>
-                        <td style="text-align: end;">${electricTotal}</td>
-                    </tr>
-                    <tr>
-                        <td>ค่าน้ำประปา</td>
-                        <td style="text-align: center;">${bill.pre_water}</td>
-                        <td style="text-align: center;">${bill.cur_water}</td>
-                        <td style="text-align: end;">${bill.cur_water - bill.pre_water}</td>
-                        <td style="text-align: end;">35</td>
-                        <td style="text-align: end;">${waterTotal}</td>
-                    </tr>
-                    <tr class="total-amount-row">
-                        <td colspan="5">รวมทั้งหมด</td>
-                        <td style="text-align: end;">${bill.amount} บาท</td>
-                    </tr>
-                </tbody>
-            </table>
-            <p><strong>สถานะ:</strong> <span style="color: ${status.color};">${status.text}</span></p>
-            <p><strong>สร้างเมื่อ:</strong> <span style="color: ${createColor};">${bill.timestamp || 'ไม่มี'}</span></p>
-            <p><strong>อัปเดตเมื่อ:</strong> <span style="color: ${updateColor};">${bill.update_at || 'ไม่มี'}</span></p>
-            <p><strong>รหัสอ้างอิง:</strong> <span style="color: ${refColor};">${bill.reference_id || 'ไม่มี'}</span></p>
-            <div id="payment-button-container"></div>
-        `;
+    <h2>รหัสใบรับเงิน/ใบแจ้งหนี้: ${bill.bill_id}</h2>
+    <p><strong>เลขที่ห้อง:</strong> ${bill.room_num}</p>
+    <p><strong>ชื่อ:</strong> คุณ${bill.firstname}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>รายการ</th>
+                <th>จดครั้งก่อน</th>
+                <th>จดครั้งนี้</th>
+                <th>หน่วยที่ใช้</th>
+                <th>ราคา/หน่วย</th>
+                <th>จำนวนเงิน</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>ค่าเช่า</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td style="text-align: end;">${roomPrice}</td>
+            </tr>
+            <tr>
+                <td>ค่าไฟฟ้า</td>
+                <td style="text-align: center;">${bill.previous_elec}</td>
+                <td style="text-align: center;">${bill.last_elec}</td>
+                <td style="text-align: end;">${bill.last_elec - bill.previous_elec}</td>
+                <td style="text-align: end;">8</td>
+                <td style="text-align: end;">${electricTotal}</td>
+            </tr>
+            <tr>
+                <td>ค่าน้ำประปา</td>
+                <td style="text-align: center;">${bill.previous_water}</td>
+                <td style="text-align: center;">${bill.last_water}</td>
+                <td style="text-align: end;">${bill.last_water - bill.previous_water}</td>
+                <td style="text-align: end;">10</td>
+                <td style="text-align: end;">${waterTotal}</td>
+            </tr>
+            <tr class="total-amount-row">
+                <td colspan="5">รวมทั้งหมด</td>
+                <td style="text-align: end;">${bill.total_amount} บาท</td>
+            </tr>
+        </tbody>
+    </table>
+    <p><strong>สถานะ:</strong> <span style="color: ${status.color};">${status.text}</span></p>
+    <p><strong>สร้างเมื่อ:</strong> <span style="color: ${createColor};">${formatDateThai(bill.create_at)}</span></p>
+    <p><strong>อัปเดตเมื่อ:</strong> <span style="color: ${updateColor};">${formatDateThai(bill.update_at)}</span></p>
+    <p><strong>รหัสอ้างอิง:</strong> <span style="color: ${refColor};">${bill.reference_id || 'ไม่มี'}</span></p>
+    <div id="payment-button-container"></div>
+`;
+
 
         // Show payment button if status is 'pending'
         if (bill.status === 'pending') {
@@ -208,9 +227,22 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-window.addEventListener('pageshow', function(event) {
+window.addEventListener('pageshow', function (event) {
     if (event.persisted) {
         // ถ้าเกิดจากการใช้ Go Back หรือ Go Forward
         window.location.reload(); // Refresh หน้าทันที
     }
 });
+
+function formatDateThai(dateString) {
+    const date = new Date(dateString);
+    const options = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        timeZone: 'Asia/Bangkok'
+    };
+
+    // ใช้ Intl.DateTimeFormat เพื่อแสดงวันที่ไทย (พ.ศ.)
+    return new Intl.DateTimeFormat('th-TH', options).format(date);
+}

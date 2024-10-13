@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรไฟล์ผู้เช่า</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; 
+            margin: 0;
+        }
+
+        .profile-container {
+            display: flex;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+            background-size: cover;
+            background-position: center;
+            background-image: url('img/Frame\ 39\ \(2\).svg');
+            background-color: #d8ebfa;
+            width: 1619px;
+            height: 700px;
+        }
+
+        .left-section {
+            text-align: center;
+            padding: 20px;
+            width: 30%;
+            margin-top: 5%;
+        }
+
+        .left-section img {
+            width: 269px;
+            height: 269px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            object-fit: cover;
+            background-color: #fff;
+        }
+
+        .room-number {
+            font-size: 40px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: #333;
+            background-image: url(img/Rectangle\ 174.png);
+            background-size: cover;
+            padding: 20px;
+        }
+
+        .edit-button {
+            background-color: #004367;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 36px;
+            width: 400px;
+        }
+
+        .edit-button:hover {
+            background-color: #0052a3;
+        }
+
+        .right-section {
+            margin: 50px;
+            flex-grow: 1;
+            background-color: #fff;
+            border-radius: 3%;
+            width: 700px;
+            height: 500px;
+        }
+
+        .tenant-header {
+            background-color: #2a475e;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 32px;
+            margin-bottom: 20px;
+            width: 80px;
+            margin-left: 100px;
+            margin-top: 40px;
+        }
+        .infobox {
+            display: flex;
+            gap: 50px;
+        }
+
+        .tenant-info {
+            display: inline;
+            margin: 10px;
+        }
+
+        .tenant-info p {
+            font-size: 32px;
+            margin: 5px 0;
+            margin-left: 150px;
+            text-align: start;
+        }
+
+        .tenant-info strong {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .email-info {
+            margin-top: 20px;
+            font-size: 32px;
+            text-align: start;
+            margin-left: 150px;
+        }
+
+        .navbar {
+            position: fixed;
+            overflow: hidden;
+            width: 100%;
+            top: 0;
+            background-color: #fdfdfd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: rgb(10, 10, 10);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            height: 8%;
+        }
+
+        .navbar .left-nav {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            padding-left: 20px;
+        }
+
+        .navbar .middle-section {
+            flex: 2;
+            /* กำหนดให้กลางกว้างกว่าส่วนอื่น */
+            display: flex;
+            justify-content: center;
+            /* จัดให้อยู่ตรงกลาง */
+            align-items: center;
+        }
+
+        .navbar .middle-section a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .navbar .middle-section a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding-right: 20px;
+        }
+
+        .navbar .right-nav a {
+            color: rgb(10, 10, 10);
+            text-decoration: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+        }
+
+        .navbar .right-nav a:hover {
+            background-color: #d3d3d3;
+            border-radius: 4px;
+        }
+
+        .navbar-logo {
+            height: 40px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="left-nav">
+            <img src="/img/dormmate-high-resolution-logo-black-transparent.png" alt="Logo" class="navbar-logo">
+    
+        </div>
+        <div class="middle-section">
+            <a href="/index.html">Home</a>
+            <a href="#service">Service</a>
+            <a href="#feature">Feature</a>
+            <a href="#product">Product</a>
+            <a href="#faq">FAQ</a>
+        </div>
+        <div class="right-nav">
+            <a href="#signin">Sign In</a>
+            <a href="#signup" style="background-color: #186a99; color: #f1f1f1;">Sign Up</a>
+        </div>
+    </div>
+    <div class="profile-container">
+        <!-- Left Section -->
+        <div class="left-section">
+            <img src="/img/Bgleft.png" alt="Profile Picture">
+            <div id="room-number" class="room-number">ห้องหมายเลข 4</div>
+
+        </div>
+
+        <!-- Right Section -->
+        <div class="right-section">
+            <div class="tenant-header">ผู้เช่า</div>
+            <div class="tenant-info">
+                <div class="infobox"><p><strong>ชื่อ:</strong><span id="firstname"></span></p>
+                    <p><strong>นามสกุล:</strong><span id="lastname"></span></p></div>
+                <div class="infobox"><p><strong>ชื่อเล่น:</strong><span id="nickname"></span></p>
+                        <p><strong>วันเกิด:</strong><span id="bd"></span></p></div>
+                <div class="infobox"><p><strong>เพศ:</strong><span id="sex"></span></p></div>
+            </div>
+            <div class="email-info">
+                <p><strong>Email:</strong><span id="email"></span></p>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="edit.js"></script>
+</html>

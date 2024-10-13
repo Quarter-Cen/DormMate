@@ -36,7 +36,7 @@ const initMysql = async () => {
         host: 'localhost',
         user: 'root',
         password: '',
-        database: 'tutorial',
+        database: 'dormmate',
     });
 };
 
@@ -67,6 +67,7 @@ const authenticateToken = async (req, res, next) => {
     let authToken = ''
     if (authHeader) {
         authToken = authHeader.split(' ')[1]
+
     }
 
     if (authToken == null) {
@@ -76,11 +77,26 @@ const authenticateToken = async (req, res, next) => {
     try {
         const user = jwt.verify(authToken, SECRET);
         req.user = user;
+
         // Execute the query to find user's room and role
-        const [result] = await conn.query(`SELECT * FROM user_rooms WHERE user_id = ?`, [req.user.id]);
+        const [result] = await conn.query(
+            `SELECT 
+                u.user_id,
+                ur.room_num,
+                CASE 
+                    WHEN a.user_id IS NOT NULL THEN 'admin'
+                    ELSE 'user' 
+                END AS role
+            FROM 
+                users u
+            LEFT JOIN 
+                admins a ON a.user_id = u.user_id
+            LEFT JOIN
+                users_rooms ur ON ur.user_id = u.user_id
+            WHERE u.user_id = ? `, [req.user.id]);
 
         if (result.length > 0) {
-            req.user.room = result[0].room_id;
+            req.user.room = result[0].room_num;
             req.user.role = result[0].role;
         } else {
             return res.status(403).json({ message: 'User has no assigned room or role' });
@@ -96,15 +112,17 @@ const authorizeOwnData = (req, res, next) => {
     const userId = req.user.id; // ID ของผู้ใช้จาก token
     const resourceId = parseInt(req.params.id, 10); // ID ของข้อมูลที่ร้องขอจาก URL parameters
     const userRole = req.user.role;
+    const room = req.user.room
 
     if (userRole === 'admin') {
         return next();
     }
 
-    if (userId !== resourceId) {
+    if (room !== resourceId) {
         return res.status(403).json({
             message: 'Access denied',
-            UID: userId
+            UID: userId,
+            room
         });
     }
 
@@ -122,7 +140,7 @@ const authorizeBillDetailsAccess = async (req, res, next) => {
         }
         if (!BillId) {
             const [defaults] = await conn.query(
-                `SELECT bill_id FROM bill 
+                `SELECT bill_id FROM bills 
                 WHERE room_num = ? 
                 LIMIT 1`,
                 [roomId]
@@ -132,7 +150,7 @@ const authorizeBillDetailsAccess = async (req, res, next) => {
         }
 
         const [rows] = await conn.query(
-            `SELECT * FROM bill
+            `SELECT * FROM bills
              WHERE bill_id = ? AND room_num = ?`,
             [BillId, roomId]
         );
@@ -140,7 +158,8 @@ const authorizeBillDetailsAccess = async (req, res, next) => {
         if (rows.length === 0 || (userRole !== 'admin' && userRole !== 'user')) {
             return res.status(403).json({
                 message: 'Access denied: You do not have access to this room',
-                UID: req.user.id
+                UID: req.user.id,
+                room: req.user.room
             });
         }
 
@@ -171,7 +190,7 @@ const validateData = (userData) => {
 const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 
 // Routes
-app.get('/', (req, res) => {
+app.get('/', authenticateToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'index.html'));
 });
 app.get('/payment/detail', (req, res) => {
@@ -195,22 +214,54 @@ app.get('/oauth2callback', async (req, res) => {
 });
 
 
+
+app.get(`/getBills`, authenticateToken, authorizeOwnData, async (req, res) => {
+    try {
+        let id = req.params.id;
+        let bill = []
+        let room = req.user.room
+
+        if (id === null || id === undefined || id === 'null' || id === '') {
+            id = req.user.room
+        }
+
+        if (req.user.role === 'admin') {
+            [bill] = await conn.query(`SELECT * FROM bills`);
+
+            return res.json({ bill, message: 'use in stat' });
+        } else {
+            [bill] = await conn.query(`SELECT * FROM bills WHERE room_num = ?`, [room]);
+        }
+
+
+        if (bill.length === 0) {
+            return res.status(404).json({ message: 'No bill found for this room' });
+        }
+
+        res.json(bill);
+    } catch (error) {
+        console.error('Error fetching bill:', error.message);
+        res.status(500).json({ error: 'Error fetching bill' });
+    }
+});
+
 app.get(`/getBills/:id?`, authenticateToken, authorizeOwnData, async (req, res) => {
     try {
         let id = req.params.id;
         let bill = []
         let room = req.user.room
+
+        if (req.user.role === 'admin' && (id === null || id === undefined || id === 'null' || id === '')) {
+            [bill] = await conn.query(`SELECT * FROM bills`);
+
+            return res.json({ bill, message: 'use in stat' })
+        }
+
         if (id === null || id === undefined || id === 'null' || id === '') {
             id = req.user.room
-
         }
 
-        if (req.user.role === 'admin') {
-            [bill] = await conn.query(`SELECT * FROM bill`);
-        } else {
-            [bill] = await conn.query(`SELECT * FROM bill WHERE room_num = ?`, [room]);
-        }
-
+        [bill] = await conn.query(`SELECT * FROM bills WHERE room_num = ?`, [id]);
 
         if (bill.length === 0) {
             return res.status(404).json({ message: 'No bill found for this room' });
@@ -231,7 +282,7 @@ app.get(`/getBillDetails/:id?`, authenticateToken, authorizeBillDetailsAccess, a
         if (id === null || id === undefined || id === 'null') {
             id = req.user.room
             const [defaults] = await conn.query(
-                `SELECT bill_id FROM bill 
+                `SELECT bill_id FROM bills 
                 WHERE room_num = ? 
                 LIMIT 1`,
                 [id]
@@ -240,7 +291,7 @@ app.get(`/getBillDetails/:id?`, authenticateToken, authorizeBillDetailsAccess, a
 
         }
 
-        const [results] = await conn.query('SELECT * FROM bill WHERE bill_id = ?', [id]);
+        const [results] = await conn.query('SELECT b.*,u.firstname FROM bills b JOIN users_rooms ur ON b.room_num = ur.room_num JOIN users u ON u.user_id = ur.user_id WHERE bill_id = ?', [id]);
 
         if (results.length === 0) {
             // ส่งสถานะ 404 ถ้าหากไม่พบข้อมูล
@@ -353,7 +404,7 @@ app.post('/check-email', async (req, res) => {
     try {
         // ตรวจสอบว่าอีเมลนี้เคยตรวจสอบแล้วหรือไม่
         const [checkedRows] = await conn.query(
-            `SELECT * FROM bill WHERE reference_id = ?`,
+            `SELECT * FROM bills WHERE reference_id = ?`,
             [emailId]
         );
 
@@ -366,20 +417,19 @@ app.post('/check-email', async (req, res) => {
 
 
         const [rows] = await conn.query(
-            `SELECT * FROM bill WHERE ABS(amount - ?) <= ? AND bill_id = ? AND status = 'pending'`,
+            `SELECT * FROM bills WHERE ABS(total_amount - ?) <= ? AND bill_id = ? AND status = 'pending'`,
             [amount, tolerance, bill_id]
         );
 
         if (rows.length > 0) {
             try {
                 const [results] = await conn.query(
-                    `UPDATE bill SET status = 'success', reference_id = ?, update_at = CURRENT_TIMESTAMP WHERE bill_id = ?`,
+                    `UPDATE bills SET status = 'success', reference_id = ? WHERE bill_id = ?`,
                     [emailId, rows[0].bill_id]
                 );
             } catch (error) {
                 console.error('Error executing query:', error);
             }
-
 
             res.json({ match: true, message: 'Status updated successfully' });
         } else {
@@ -391,24 +441,101 @@ app.post('/check-email', async (req, res) => {
     }
 });
 
+app.get(`/get_rooms_for_admin`, async (req, res) => {
+    const [results] = await conn.query(`
+        SELECT 
+            u.user_id, 
+            u.firstname, 
+            u.lastname, 
+            r.room_num 
+        FROM 
+            users u 
+        LEFT JOIN 
+            users_rooms ur ON u.user_id = ur.user_id 
+        LEFT JOIN 
+            rooms r ON ur.room_num = r.room_num;
+`)
 
-// CRUD Operations for Users
-app.get('/users', authenticateToken, async (req, res) => {
-    const id = req.user.id
+    res.json(results);
+})
+
+app.get(`/get_users_for_admin`, async (req, res) => {
+    const [results] = await conn.query(`
+        SELECT 
+            r.room_num, 
+            GROUP_CONCAT(ur.user_id SEPARATOR ', ') AS user_ids, 
+            GROUP_CONCAT(CONCAT(u.firstname, ' ', u.lastname) SEPARATOR ', ') AS fullnames 
+        FROM 
+            rooms r 
+        LEFT JOIN 
+            users_rooms ur ON ur.room_num = r.room_num 
+        LEFT JOIN 
+            users u ON ur.user_id = u.user_id 
+        GROUP BY 
+            r.room_num;
+`)
+
+    res.json(results);
+})
+
+app.post('/add_user_to_room', async (req, res) => {
+    const { user_id, room_num } = req.body;
 
     try {
-        const [results] = await conn.query(`SELECT * FROM users WHERE id = ?`, [id]);
+        // เรียกใช้ Stored Procedure
+        const [result] = await conn.query(`CALL addUserToRoom(?, ?);`, [user_id, room_num]);
+
+        // ส่งผลลัพธ์กลับไปยัง client
+        res.status(200).json({ message: 'User added successfully.' });
+    } catch (error) {
+        console.error('Error inserting user:', error.message);
+
+        // ส่งข้อผิดพลาดกลับไปยัง client
+        res.status(500).json({
+            message: error.message || 'Something went wrong'
+        });
+    }
+});
+
+
+app.get(`/get_rooms/:id?`, authenticateToken, async (req, res) => {
+    try {
+        const room = req.user.room
+        let id = req.params.id;
+
+        if (id === null || id === undefined || id === 'null') {
+            const [results] = await conn.query(`SELECT * FROM users_rooms ur JOIN users u ON u.user_id = ur.user_id WHERE room_num = ?`, [room]);
+            return res.json(results);
+        }
+
+        const [results] = await conn.query(`SELECT * FROM users_rooms ur JOIN users u ON u.user_id = ur.user_id WHERE room_num = ?`, [id]);
         res.json(results);
+
+
     } catch (error) {
         console.error('Error fetching users:', error.message);
         res.status(500).json({ error: 'Error fetching users' });
     }
 });
 
-app.get('/users/:id', async (req, res) => {
+
+
+// CRUD Operations for Users
+app.get('/users', authenticateToken, async (req, res) => {
+    const id = req.user.id
+    try {
+        const [results] = await conn.query(`SELECT * FROM users WHERE user_id = ?`, [id]);
+        res.json({results, role: req.user.role});
+    } catch (error) {
+        console.error('Error fetching users:', error.message);
+        res.status(500).json({ error: 'Error fetching users' });
+    }
+});
+
+app.get(`/users/:id?`, async (req, res) => {
     try {
         const id = req.params.id;
-        const [results] = await conn.query('SELECT * FROM users WHERE id = ?', [id]);
+        const [results] = await conn.query('SELECT * FROM users WHERE user_id = ?', [id]);
         if (results.length === 0) {
             throw { statusCode: 404, message: 'Not found' };
         }
@@ -420,46 +547,23 @@ app.get('/users/:id', async (req, res) => {
 });
 
 
-
 app.post('/register', async (req, res) => {
     try {
-        let { firstname, lastname, nickname, age, gender, address, email, password, confirmPassword, uniqueCode } = req.body;
+        let { firstname, lastname, nickname, gender, address, email, password, dob, tel, image } = req.body;
 
         const passwordHash = await bcrypt.hash(password, 10);
-
-        const errors = validateData({ firstname, lastname, nickname, age, gender, address, email, password, confirmPassword, uniqueCode });
-        if (errors.length > 0) {
-            throw {
-                message: 'กรอกข้อมูลไม่ครบ',
-                errors: errors
-            };
-        }
-
-        const confirmPasswordErrors = confirmPassword !== password ? ['รหัสผ่านไม่ตรงกัน'] : [];
-        if (confirmPasswordErrors.length > 0) {
-            throw {
-                message: 'ข้อมูลไม่ตรงกัน',
-                errors: confirmPasswordErrors
-            };
-        }
-
-        const isUniqueCodeErrors = uniqueCode !== 'test' ? ['ไม่พบรหัสเฉพาะ'] : []; // สมมติว่า IsUniqueCode เป็น async function ที่ตรวจสอบรหัสเฉพาะ
-        if (isUniqueCodeErrors.length > 0) {
-            throw {
-                message: 'ไม่พบรหัสเฉพาะ',
-                errors: isUniqueCodeErrors
-            };
-        }
 
         const user = {
             firstname,
             lastname,
             nickname,
-            age,
+            birthdate: dob,
             gender,
             address,
             email,
-            password: passwordHash
+            password: passwordHash,
+            tel,
+            image
         };
 
         const [results] = await conn.query('INSERT INTO users SET ?', [user]);
@@ -479,7 +583,7 @@ app.post('/register', async (req, res) => {
 app.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const [result] = await conn.query('SELECT * FROM users WHERE email = ?', email)
+        const [result] = await conn.query('SELECT * FROM users WHERE email = ?', [email])
 
         if (result.length === 0) {
             return res.status(400).json({
@@ -489,14 +593,15 @@ app.post('/login', async (req, res) => {
         }
 
         const userData = result[0]
-        const id = userData.id
+        const id = userData.user_id
+
         const match = await bcrypt.compare(password, userData.password)
         if (!match) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: 'Login Fail',
-                errors: ['Wrong Email, Password']
+                errors: ['อีเมล์ หรือ รหัสผ่านไม่ถูกต้อง']
             })
-            return false
+
         }
 
         const token = jwt.sign({ email, id }, SECRET, { expiresIn: '1h' })
@@ -537,20 +642,38 @@ app.put('/users/:id', async (req, res) => {
     }
 });
 
-app.delete('/users/:id', async (req, res) => {
+app.delete('/delete_user/:id', authenticateToken, async (req, res) => {
+    const userId = req.params.id;
+
     try {
-        const id = req.params.id;
-        const [results] = await conn.query('DELETE FROM users WHERE id = ?', [id]);
-        res.json({
-            message: 'Delete ok',
-            deleteID: id,
-            data: results
-        });
+        const [result] = await conn.query('DELETE FROM users WHERE user_id = ?', [userId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการลบ' });
+        }
+
+        res.status(200).json({ message: 'ผู้ใช้ถูกลบเรียบร้อยแล้ว' });
     } catch (error) {
         console.error('Error deleting user:', error.message);
-        res.status(500).json({
-            message: 'Something went wrong'
-        });
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบผู้ใช้' });
+    }
+});
+
+
+app.delete('/delete_user_from_room/:id', authenticateToken, async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const [result] = await conn.query('DELETE FROM users_rooms WHERE user_id = ?', [userId]);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'ไม่พบผู้ใช้ที่ต้องการลบ' });
+        }
+
+        res.status(200).json({ message: 'ผู้ใช้ถูกลบเรียบร้อยแล้ว' });
+    } catch (error) {
+        console.error('Error deleting user:', error.message);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบผู้ใช้' });
     }
 });
 
@@ -561,11 +684,11 @@ app.post('/generateQR', async (req, res) => {
 
     try {
         const id = billId
-        const [results] = await conn.query('SELECT amount FROM bill WHERE bill_id = ?', [id]);
+        const [results] = await conn.query('SELECT total_amount FROM bills WHERE bill_id = ?', [id]);
         if (results.length === 0) {
             throw { statusCode: 404, message: 'Not found' };
         }
-        let amount = parseFloat(results[0].amount);
+        let amount = parseFloat(results[0].total_amount);
 
         const mobileNumber = '0637744433'; // หมายเลขโทรศัพท์ที่ใช้ใน QR Code
         const payload = generatePayload(mobileNumber, { amount });
@@ -584,7 +707,6 @@ app.post('/generateQR', async (req, res) => {
                     RespMessage: 'bad : ' + err
                 });
             } else {
-
                 pendingQRRequests.push({ billId, url });
                 return res.status(200).json({
                     RespCode: 200,
@@ -646,16 +768,16 @@ app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (re
     const room = req.user.room
 
     const file = req.file;
-    
+
     console.log(id)
 
     const [rows] = await conn.query(
-        `SELECT * FROM bill WHERE bill_id = ? AND status = 'pending'`,
+        `SELECT * FROM bills WHERE bill_id = ? AND status = 'pending'`,
         [id]
     );
 
-    if (!rows.length > 0){
-        return res.json({message: "fail"})
+    if (!rows.length > 0) {
+        return res.json({ message: "fail" })
     }
 
     // ตรวจสอบว่าได้รับข้อมูลแบบใดบ้าง
@@ -674,36 +796,37 @@ app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (re
         });
 
 
-    // ตั้ง log ให้เป็น true เสมอ
-    formData.append('log', 'true');
+        // ตั้ง log ให้เป็น true เสมอ
+        formData.append('log', 'true');
 
-    try {
-        // ส่งคำขอไปยัง API ภายนอกด้วย axios
-        const response = await axios.post('https://api.slipok.com/api/line/apikey/25333', formData, {
-            headers: {
-                'x-authorization': 'SLIPOKKJCXJTN',
-                ...formData.getHeaders(), // ใช้เพื่อให้ Axios ตั้งค่า header สำหรับ multipart/form-data ได้ถูกต้อง
-            },
-        });
+        try {
+            // ส่งคำขอไปยัง API ภายนอกด้วย axios
+            const response = await axios.post('https://api.slipok.com/api/line/apikey/25333', formData, {
+                headers: {
+                    'x-authorization': 'SLIPOKKJCXJTN',
+                    ...formData.getHeaders(), // ใช้เพื่อให้ Axios ตั้งค่า header สำหรับ multipart/form-data ได้ถูกต้อง
+                },
+            });
 
-        const [results] = await conn.query(
-            `UPDATE bill SET status = 'success', reference_id = ?, update_at = CURRENT_TIMESTAMP WHERE bill_id = ?`,
-            [response.data.data.transRef, rows[0].bill_id]
-        )
+            const [results] = await conn.query(
+                `UPDATE bills SET status = 'success', reference_id = ? WHERE bill_id = ?`,
+                [response.data.data.transRef, rows[0].bill_id]
+            )
 
-        res.status(response.status).json({
-            message: "success",
-            detail : response.data.request
-        });
-    } catch (error) {
-        console.error('Error sending request to external API:', error.response.data.message);
-        res.status(error.response ? error.response.status : 500).json(error.response.data.message);
+            res.status(response.status).json({
+                message: "success",
+                detail: response.data.request
+            });
+        } catch (error) {
+            console.error('Error sending request to external API:', error.response.data.message);
+            res.status(error.response ? error.response.status : 500).json(error.response.data.message);
+        }
     }
-}});
+});
 
-app.post('/test', (req, res)=>{
+app.post('/test', (req, res) => {
     res.json({
-        message : "hapi",
+        message: "hapi",
     })
 })
 

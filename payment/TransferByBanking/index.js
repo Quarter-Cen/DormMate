@@ -43,7 +43,7 @@ window.onload = async () => {
             }
         });
 
-        const user = userResponse.data[0];
+        const user = userResponse.data.results[0];
 
         // Update the navbar with user's full name
         const rightNav = document.querySelector('.right-nav');
@@ -73,6 +73,12 @@ window.onload = async () => {
         const content = document.querySelector('.box');
         content.style.display = 'block';
 
+        const response = await axios.get(`${BASE_URL}/getBillDetails/${billId}`, {
+            headers: {
+                'authorization': `Bearer ${authToken}`
+            }
+        });
+
     } catch (error) {
         console.error('Error:', error.response?.data?.message || error.message);
 
@@ -83,7 +89,9 @@ window.onload = async () => {
         } else if (error.response?.data?.message === 'Access denied') {
             window.location.replace(`http://localhost:8000/payment/?id=${error.response.data.UID}`);
         } else {
+            alert(error.response.data.message)
             document.body.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
+            window.location.replace(`http://localhost:8000/payment/?id=${error.response.data.UID}`);
         }
     }
 };

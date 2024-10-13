@@ -527,6 +527,34 @@
             font-size: 18px;
             color: #333;
         }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 30px;
+            top: 60px;
+            background-color: white;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 5000;
+            width: 150px;
+        }
+
+        .dropdown-content a {
+            padding: 10px 20px;
+            display: block;
+            text-decoration: none;
+            color: black;
+            border-bottom: 1px solid #f1f1f1;
+        }
+
+        .dropdown-content a:hover {
+            background-color: #d3d3d3;
+        }
+
+        .dropdown-content a:last-child {
+            border-bottom: none;
+        }
     </style>
 </head>
 
@@ -535,7 +563,7 @@
         <div class="navbar">
             <div class="left-nav">
                 <img src="/img/dormmate-high-resolution-logo-black-transparent.png" alt="Logo" class="navbar-logo">
-        
+
             </div>
             <div class="middle-section">
                 <a href="/index.html">Home</a>
@@ -557,7 +585,7 @@
                 <div class="right" style="width: 100%; height: 100%; justify-content: center; align-items: center;">
 
                     <div class="right-column">
-                        <h2 class="bill-header">บิลของคุณ</h2>
+                        <h2 class="bill-header">จัดการสมาชิก</h2>
                         <input type="text" id="searchBar" placeholder="ค้นหา..." />
                         <div id="background-circle1"></div>
                         <div id="background-circle2"></div>
@@ -568,12 +596,10 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>เลขที่ใบเสร็จ</th>
                                         <th>เลขที่ห้อง</th>
-                                        <th>จำนวนเงิน</th>
-                                        <th>สถานะ</th>
-                                        <th>สร้างเมื่อ</th>
-                                        <th>เลขที่อ้างอิง</th>
+                                        <th>รหัสผู้อยู่</th>
+                                        <th>ชื่อ - นามสกุล</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>

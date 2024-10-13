@@ -38,7 +38,7 @@ window.onload = async () => {
             box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
             pointer-events: none;
         ">
-            <span style="
+            <span id="profile-icon" style="
                 color: white;
                 font-size: 18px;
                 padding-left: 10px;
@@ -47,109 +47,122 @@ window.onload = async () => {
             ">
                 ${user.firstname} ${user.lastname}
             </span>
+            <div class="dropdown-content" id="dropdown-menu">
+        <a href="#">โปรไฟล์</a>
+        <a href="#">จัดการบัญชี</a>
+        <a href="#">Log out</a>
+      </div>
         </div>`;
 
-        const response = await axios.get(`${BASE_URL}/getBills/${id}`, {
+        const response = await axios.get(`${BASE_URL}/get_rooms_for_admin`, {
             headers: {
                 'authorization': `Bearer ${authToken}`
             }
         });
-
+        
         const data = response.data.bill || response.data;
-        console.log(data)
+        console.log(data);
         const newRoom_num = data[0].room_num;
-
+        
         const tbody = document.querySelector("table tbody");
         tbody.innerHTML = ''; // Clear existing rows
-
+        
         data.forEach(bill => {
             const row = document.createElement("tr");
-            row.setAttribute('data-id', bill.bill_id);
-
-            const receiptCell = document.createElement("td");
-            receiptCell.textContent = bill.bill_id;
-            row.appendChild(receiptCell);
-
+            row.setAttribute('data-id', bill.user_id);
+        
             const roomCell = document.createElement("td");
-            roomCell.textContent = bill.room_num;
+            let roomColor = 'gray';
+            if (bill.room_num) {
+                roomColor = 'black';
+            }
+            roomCell.style.color = roomColor;
+            roomCell.textContent = bill.room_num ? bill.room_num : 'ไม่มี';
             row.appendChild(roomCell);
-
-            const amountCell = document.createElement("td");
-            amountCell.textContent = `${bill.total_amount} บาท`;
-            row.appendChild(amountCell);
-
-            const statusCell = document.createElement("td");
-            let status = 'NULL';
-            if (bill.status === 'pending') {
-                status = 'ยังไม่ชำระ';
-                statusCell.style.color = 'red';
-            } else if (bill.status === 'success') {
-                status = 'ชำระแล้ว';
-                statusCell.style.color = 'green';
-            } else {
-                status = 'ล้มเหลว';
-                statusCell.style.color = 'gray';
+        
+            const userCell = document.createElement("td");
+            let userColor = 'gray';
+            if (bill.user_id) {
+                userColor = 'black';
             }
-            statusCell.textContent = status;
-            row.appendChild(statusCell);
-
-            const updatedCell = document.createElement("td");
-            let updateColor = 'gray';
-            
-            if (bill.create_at && bill.create_at.trim() !== '') {
-                updateColor = 'black';
-                const date = new Date(bill.create_at);
-                const formattedDate = date.toLocaleDateString('th-TH', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
-                updatedCell.textContent = formattedDate;
-            } else {
-                updatedCell.textContent = 'ไม่มี';
-            }
-
-            updatedCell.style.color = updateColor;
-            row.appendChild(updatedCell);
-
+            userCell.style.color = userColor;
+            userCell.textContent = bill.user_id ? bill.user_id : 'ไม่มี';
+            row.appendChild(userCell);
+        
             const referenceCell = document.createElement("td");
             let refColor = 'gray';
-            if (bill.reference_id && bill.reference_id.trim() !== '') {
+            let fullname = bill.firstname + " " + bill.lastname;
+        
+            if (fullname) {
                 refColor = 'black';
             }
+        
+            referenceCell.textContent = fullname ? fullname : 'ไม่มี';
+        
+            if (!bill.firstname || !bill.lastname){
+                referenceCell.textContent = 'ไม่มี';
+                refColor = 'gray';
+            }
+        
             referenceCell.style.color = refColor;
-            referenceCell.textContent = bill.reference_id ? bill.reference_id : 'ไม่มี';
             row.appendChild(referenceCell);
-
+        
+            // สร้างเซลล์สำหรับปุ่มลบ
+            const deleteCell = document.createElement("td");
+            const deleteButton = document.createElement("button");
+            deleteButton.textContent = "ลบ";
+            deleteButton.style.color = "red"; // เปลี่ยนสีข้อความของปุ่มเป็นแดง
+        
+            // เพิ่ม event listener สำหรับปุ่มลบ
+            deleteButton.addEventListener('click', async (e) => {
+                e.stopPropagation(); // ป้องกันการคลิกที่แถว
+                const confirmation = confirm('คุณแน่ใจหรือว่าต้องการลบผู้ใช้?');
+                if (confirmation) {
+                    try {
+                        await axios.delete(`${BASE_URL}/delete_user/${bill.user_id}`, {
+                            headers: {
+                                'authorization': `Bearer ${authToken}`
+                            }
+                        });
+                        // ลบแถวจาก DOM
+                        row.remove();
+                        alert('ผู้ใช้ถูกลบเรียบร้อยแล้ว');
+                    } catch (error) {
+                        console.error('Error deleting user:', error);
+                        alert('เกิดข้อผิดพลาดในการลบผู้ใช้');
+                    }
+                }
+            });
+        
+            deleteCell.appendChild(deleteButton);
+            row.appendChild(deleteCell);
+        
             tbody.appendChild(row);
         });
-
+        
         document.querySelectorAll('table tbody tr').forEach(row => {
             row.addEventListener('click', function () {
                 const billId = this.getAttribute('data-id');
-                window.location.href = `detail.html?id=${billId}`;
+                window.location.href = `edit.html?id=${billId}`;
             });
         });
         content.style.display = 'block';
-
-    } catch (error) {
-        console.error('Error:', error.response?.data?.message || error.message);
-
-        if (error.response?.data?.message === 'Invalid or expired token') {
-            sessionStorage.removeItem('token');
-            window.location.href = `${BASE_URL}/login.html`;
-        }
-
-        if (error.response?.data?.message === 'Access denied') {
-            if(!error.response.data.room){
-                window.location.replace(`http://localhost:8000`);
+        
+        } catch (error) {
+            console.error('Error:', error.response?.data?.message || error.message);
+        
+            if (error.response?.data?.message === 'Invalid or expired token') {
+                sessionStorage.removeItem('token');
+                window.location.href = `${BASE_URL}/login.html`;
             }
-            window.location.replace(`http://localhost:8000/payment/?id=${error.response.data.room}`);
+        
+            if (error.response?.data?.message === 'Access denied') {
+                window.location.replace(`http://localhost:8000/payment/?id=${error.response.data.room}`);
+            }
+        
+            document.body.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
         }
-
-        document.body.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
-    }
-};
+}
 
 document.addEventListener("DOMContentLoaded", function () {
     const overlay = document.getElementById('loading-overlay');

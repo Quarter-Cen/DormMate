@@ -1,195 +1,240 @@
-const BASE_URL = 'http://localhost:8000'
+const BASE_URL = 'http://localhost:8000';
 
-let mode = 'CREATE'
-let selectedID = ''
 
 window.onload = async () => {
-  const urlParams = new URLSearchParams(window.location.search)
-  const id = urlParams.get('id')
-  if (id){
-    mode = 'EDIT'
-    selectedID = id
+  const urlParams = new URLSearchParams(window.location.search);
+  const id = urlParams.get('id');
 
+  let header = document.getElementById('bill-head');
+  let sideBar = document.querySelector('.sidebar')
+
+  try {
+    const authToken = sessionStorage.getItem('token');
+    if (!authToken) {
+      console.error('Token not found in sessionStorage');
+      window.location.href = `${BASE_URL}/login.html`;
+      return;
+    }
+
+
+    const userResponse = await axios.get(`${BASE_URL}/users`, {
+      headers: {
+        'authorization': `Bearer ${authToken}`
+      }
+    });
+
+    const user = userResponse.data.results[0];
+    if(userResponse.data.role === 'admin'){
+      document.getElementById('adminOnly').style.display = 'block'
+    }
+
+
+    // Update the navbar with user's full name
+    const rightNav = document.querySelector('.right-nav');
+    rightNav.innerHTML = `
+  <div style="
+      display: flex;
+      align-items: center;
+      padding: 10px 15px;
+      margin-left: 10px;
+      margin-right: 10px;
+      background-color: #186a99;
+      border-radius: 10px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      pointer-events: none;
+  ">
+      <span id="profile-icon" style="
+          color: white;
+          font-size: 18px;
+          padding-left: 10px;
+          padding-right: 10px;
+          text-transform: capitalize;
+      ">
+          ${user.firstname} ${user.lastname}
+      </span>
+  </div>`;
     try {
-      const response = await axios.get(`${BASE_URL}/users/${id}`)
-      const user = response.data
-
-      let firstNameDOM = document.querySelector('input[name=firstname]')
-      let lastNameDOM = document.querySelector('input[name=lastname]')
-      let ageDOM = document.querySelector('input[name=age]')
-      let emailDOM = document.querySelector('input[name=email]')
-      let passwordDOM = document.querySelector('input[name=password]')
-
-    
-      let descriptionDOM = document.querySelector('textarea[name=description]')
-
-      firstNameDOM.value = user.firstname
-      lastNameDOM.value = user.lastname
-      ageDOM.value = user.age
-      descriptionDOM.value = user.description
-      emailDOM.value = user.email
-      passwordDOM.value = user.password
-
-      let genderDOMs = document.querySelectorAll('input[name=gender]')
-      let interestDOMs = document.querySelectorAll('input[name=interest]')
-
-      for (let i = 0; i < genderDOMs.length; i++) {
-        if (genderDOMs[i].value == user.gender) {
-          genderDOMs[i].checked = true
+      const sidebarRes = await axios.get(`${BASE_URL}/get_rooms/${id}`, {
+        headers: {
+          'authorization': `Bearer ${authToken}`
         }
-      }
-       
-      for (let i = 0; i < interestDOMs.length; i++) {
-        if (user.interest.includes(interestDOMs[i].value)) {
-          interestDOMs[i].checked = true
-        }
-      }
+      });
+      const rooms = sidebarRes.data; // Extract data from response
 
+      const roomDetails = rooms.length > 0 ? rooms.map(room => {
+        return `<div class="room-detail">
+              <p>ผู้อยู่อาศัย: ${room.firstname} ${room.lastname}</p>
+          </div>`;
+      }).join('') : '<p>ไม่มีข้อมูล</p>'; // Handle no rooms
 
+      sideBar.innerHTML = `<div>   
+          <h2>รายละเอียดห้องพัก</h2>
+          <p>เลขที่ห้อง: ${id !== null ? id : 'ทั้งหมด'}</p>
+          ${id !== null ? roomDetails : ''}
+
+          <a href="/payment"><button>ตรวจสอบบิล</button></a>
+      </div>`;
     } catch (error) {
-      console.log('error', error)
+      console.error('Error fetching room details:', error);
+      sideBar.innerHTML = `<div>   
+          <h2>รายละเอียดห้องพัก</h2>
+          <p>ไม่สามารถดึงข้อมูลห้องพักได้</p>
+      </div>`;
     }
-  }
-}
-
-const vaildateData = (userData) => {
-  let errors = []
-  let error_interest = document.querySelector('i[name=interest_error]')
-  let error_firstname = document.querySelector('i[name=first_error]')
-  let error_lastname = document.querySelector('i[name=interest_error]')
-
-  if (!userData.firstname) {
-    errors.push('กรุณาใส่ชื่อ')
-    error_firstname.Style.display = 'block'
-  }
-  if (!userData.lastname) {
-    errors.push('กรุณาใส่นามสกุล')
-  }
-  if (!userData.age) {
-    errors.push('กรุณาใส่อายุ')
-  }
-  if (!userData.gender) {
-    errors.push('กรุณาเลือกเพศ')
-  }
-  if (!userData.interest) {
-    errors.push('กรุณาเลือกความสนใจ')
-    error_interest.Style.display = "block"
-  }
-  if (!userData.description) {
-    errors.push('กรุณาใส่คำอธิบาย')
-  }
-  if (!userData.email) {
-    errors.push('กรุณาใส่อีเมล์')
-  }
-  if (!userData.password) {
-    errors.push('กรุณาใส่รหัสผ่าน')
-  }
-  return errors
-}
 
 
-const createBills = async() => {
-
-  let uid = 1;
-  let name = "กนก แสงจันทร์";
-  let billData = await axios.get(`${BASE_URL}/billing`)
-  console.log('Bill Data', billData.data)
-
-  let bill = {
-    room_num : uid,
-    amount : billData.data.amount,
-    pre_elect : billData.data.pre_elec_am,
-    cur_elect : billData.data.cur_elec_am,
-    pre_water : billData.data.pre_water_am,
-    cur_water : billData.data.cur_water_am,
-    name : name
-  }
-  
-  const response = await axios.post(`${BASE_URL}/billing`, bill)
-  console.log('response', response.data)
-  
-
-}
-
-const submitData =  async () => {
-    let firstNameDOM = document.querySelector('input[name=firstname]')
-    let lastNameDOM = document.querySelector('input[name=lastname]')
-    let ageDOM = document.querySelector('input[name=age]')
-    let emailDOM = document.querySelector('input[name=email]')
-    let passwordDOM = document.querySelector('input[name=password]')
-
-    let genderDOM = document.querySelector('input[name=gender]:checked') || {}
-    let interestDOMs = document.querySelectorAll('input[name=interest]:checked') || {}
-  
-    let descriptionDOM = document.querySelector('textarea[name=description]')
-
-    let messageDom = document.getElementById('message')
-
-    try{
-    let interest = ''
-  
-    for (let i = 0; i < interestDOMs.length; i++) {
-      interest += interestDOMs[i].value
-      if (i != interestDOMs.length - 1) {
-        interest += ', '
+    const response = await axios.get(`${BASE_URL}/getBills/${id}`, {
+      headers: {
+        'authorization': `Bearer ${authToken}`
       }
-    }
-  
-    let userData = {
-      firstname: firstNameDOM.value,
-      lastname: lastNameDOM.value,
-      age: ageDOM.value,
-      gender: genderDOM.value,
-      description: descriptionDOM.value,
-      interest: interest,
-      email: emailDOM.value,
-      password: passwordDOM.value
+    });
+
+    let data = response.data.bill || response.data;
+    if (header) {
+      header.innerText = `สถิติการใช้ไฟฟ้าและน้ำ ห้อง ${id}`;
     }
 
-    console.log('submit data', userData)
+    if (response.data.message === 'use in stat') {
+      data = data.slice(-12);
 
-    const errors = vaildateData(userData)
-
-    if (errors.length > 0){
-      throw {
-        message: 'กรอกข้อมูลไม่ครบ',
-        errors: errors
+      if (header) {
+        header.innerText = 'สถิติการใช้ไฟฟ้าและน้ำทุกห้อง';
       }
+
+      const newObject1 = {
+        create_at: data[0].create_at,
+        last_elec: data[0].last_elec + data[1].last_elec + data[2].last_elec,
+        last_water: data[0].last_water + data[1].last_water + data[2].last_water,
+        previous_elec: data[0].previous_elec + data[1].previous_elec + data[2].previous_elec,
+        previous_water: data[0].previous_water + data[1].previous_water + data[2].previous_water
+      }
+
+      const newObject2 = {
+        create_at: data[3].create_at,
+        last_elec: data[3].last_elec + data[4].last_elec + data[5].last_elec,
+        last_water: data[3].last_water + data[4].last_water + data[5].last_water,
+        previous_elec: data[3].previous_elec + data[4].previous_elec + data[5].previous_elec,
+        previous_water: data[3].previous_water + data[4].previous_water + data[5].previous_water
+      };
+
+      const newObject3 = {
+        create_at: data[6].create_at,
+        last_elec: data[6].last_elec + data[7].last_elec + data[8].last_elec,
+        last_water: data[6].last_water + data[7].last_water + data[8].last_water,
+        previous_elec: data[6].previous_elec + data[7].previous_elec + data[8].previous_elec,
+        previous_water: data[6].previous_water + data[7].previous_water + data[8].previous_water
+      }
+
+      const newObject4 = {
+        create_at: data[9].create_at,
+        last_elec: data[9].last_elec + data[10].last_elec + data[11].last_elec,
+        last_water: data[9].last_water + data[10].last_water + data[11].last_water,
+        previous_elec: data[9].previous_elec + data[10].previous_elec + data[11].previous_elec,
+        previous_water: data[9].previous_water + data[10].previous_water + data[11].previous_water
+      }
+
+      data.push(newObject1);
+      data.push(newObject2);
+      data.push(newObject3);
+      data.push(newObject4);
     }
+    data = data.slice(-4);
 
-    let message = 'บันทึกข้อมูลเรียบร้อย'
+    // ฟังก์ชันเพื่อแปลงวันที่เป็นรูปแบบ "1 ตุลาคม 2567"
+    const formatDateThai = (dateString) => {
+      const months = [
+        "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม",
+        "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม",
+        "พฤศจิกายน", "ธันวาคม"
+      ];
 
-    if (mode == 'CREATE') {
-      const response = await axios.post(`${BASE_URL}/users`, userData)
-      console.log('response', response.data)
+      const date = new Date(dateString);
+      const day = date.getDate(); // วันที่
+      const month = months[date.getMonth()]; // เดือน
+      const year = date.getFullYear() + 543; // ปีในระบบไทย (บวก 543)
+
+      return `${day} ${month} ${year}`; // สร้างรูปแบบวันที่
+    };
+
+    // ตรวจสอบจำนวนข้อมูลที่มีอยู่
+    const labels = [];
+    const elec_values = [];
+    const water_values = [];
+
+    // สร้าง labels และ values ตามจำนวนข้อมูลที่มี
+    for (let i = 0; i < data.length; i++) {
+      labels.push(formatDateThai(data[i].create_at)); // แปลง create_at เป็นรูปแบบที่ต้องการ
+      elec_values.push(data[i].last_elec - data[i].previous_elec);
+      water_values.push(data[i].last_water - data[i].previous_water);
+    }
+    console.log(water_values)
+    // Electricity Chart Data
+    const ctxElectricity = document.getElementById('electricityChart').getContext('2d');
+    const electricityChart = new Chart(ctxElectricity, {
+      type: 'bar',
+      data: {
+        labels: labels, // ใช้ labels ที่สร้างขึ้น
+        datasets: [{
+          label: 'ไฟฟ้า (หน่วย)',
+          data: elec_values, // ใช้ values ที่สร้างขึ้น
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgba(255, 99, 132, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y', // Set to horizontal bar chart
+        scales: {
+          x: {
+            beginAtZero: true,
+            min: 10 // เปลี่ยนเป็นค่าที่ต้องการเริ่มต้น (เช่น 10)
+          }
+        }
+      }
+    });
+
+
+
+    // Water Chart Data
+    const ctxWater = document.getElementById('waterChart').getContext('2d');
+    const waterChart = new Chart(ctxWater, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'น้ำ (หน่วย)',
+          data: water_values,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgba(54, 162, 235, 1)',
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y', // Set to horizontal bar chart
+        scales: {
+          x: {
+            beginAtZero: true,
+          }
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error:', error.response?.data?.message || error.message);
+    if (error.response?.data?.message === 'Invalid or expired token') {
+      sessionStorage.removeItem('token');
+      window.location.href = `${BASE_URL}/login.html`;
+    } else if (error.response?.data?.message === 'Access denied') {
+      if(!error.response.data.room){
+        document.body.innerHTML = `<h1>Wait for Admin...</h1>`
+        alert("You haven't assign to any room!!")
+        return
+      }
+      console.log("Access denied")
+      window.location.replace(`http://localhost:8000/?id=${error.response.data.room}`);
     } else {
-      const response = await axios.put(`${BASE_URL}/users/${selectedID}`, userData)
-      message = 'แก้ไขข้อมูลเรียบร้อย'
-      console.log('response', response.data)
-    }
-      
-      messageDom.innerText = message
-      messageDom.className = 'message success'
-    }catch (error) {
-      console.log('error message', error.message)
-      console.log('error', error.errors)
-      if (error.response) {
-        console.log(error.response)
-        error.message = error.response.data.message
-        error.errors = error.response.data.errors
-      }
-
-      let htmlData = '<div>'
-      htmlData += `<div>${error.message}</div>`
-      htmlData += '<ul>'
-      for (let i = 0; i < error.errors.length; i++){
-        htmlData += `<li>${error.errors[i]}</li>`
-      }
-      htmlData += '</ul>'
-      htmlData += '</div>'
-
-      messageDom.innerHTML = htmlData
-
-      messageDom.className = 'message danger'
+      document.body.innerHTML = '<p>เกิดข้อผิดพลาดในการโหลดข้อมูล</p>';
     }
   }
+}
+
+

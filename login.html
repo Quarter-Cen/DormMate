@@ -66,7 +66,7 @@
   .login-container .toggle-password {
       position: absolute;
       right: 10px;
-      top: 12px;
+      top: 17px;
       cursor: pointer;
       user-select: none;
   }
@@ -135,7 +135,7 @@
       <p>Password</p>
       <div class="password-container">
           <input type="password" name="password" id="password" required>
-          <span class="toggle-password" id="toggle-password" onclick="toggle()">#</span>
+          <span class="toggle-password" id="toggle-password" onclick="toggle()"><img id="eye-image" style="width: 24px;" src="img/eye-slash-alt-svgrepo-com.svg" alt=""></span>
       </div>
       <div id="password-error-button-container" style="color: red; display: none; text-align: start; margin-bottom: 4px;">กรุณากรอกรหัสผ่าน</div>
       <div id="login-fail-button-container" style="color: red; display: none; text-align: end;"></div>
@@ -147,7 +147,9 @@
 
       <!-- Submit button -->
       <button onclick="login()" class="button" name="login"><span style="font-size: x-large;">Login</span></button>
-
+      <div class="forgot-password" style="text-align: center;">
+        <span style="font-size: 12px;">ยังไม่มีบัญชี? <a style=" cursor: pointer;" onclick="linkToSignUp()">สมัคร</a></span>
+    </div>
 </div>
       
       <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

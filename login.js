@@ -2,22 +2,25 @@ const BASE_URL = 'http://localhost:8000';
 
 const toggle = () => {
   const inputElement = document.getElementById("password");
-  if(inputElement.type == "text"){
+  const eye = document.getElementById("eye-image");
+
+  if (inputElement.type === "text") {
     inputElement.type = "password";
+    eye.src = "./img/eye-slash-alt-svgrepo-com.svg";  // เปลี่ยนเป็นรูปตาที่แสดงปิดรหัสผ่าน
   } else {
     inputElement.type = "text";
+    eye.src = "./img/eye-alt-svgrepo-com.svg";  // เปลี่ยนเป็นรูปตาที่แสดงรหัสผ่าน
   }
-  
-}
+};
+
 
 const checkLoginStatus = () => {
   if (sessionStorage.getItem('token')) {
-    window.location.href = '/payment';
+    window.location.href = '/';
   }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ฟังก์ชัน login ที่จะถูกเรียกเมื่อผู้ใช้กดปุ่มเข้าสู่ระบบ
   const login = async () => {
     let emailDOM = document.querySelector('input[name=email]');
     let passwordDOM = document.querySelector('input[name=password]');
@@ -30,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!userData.email) {
         errors.push('กรุณาใส่อีเมล์');
         emailButtonContainer.style.display = 'block';
-        loginfailButtonContainer.style.display = 'none'
+        loginfailButtonContainer.style.display = 'none';
       } else {
         emailButtonContainer.style.display = 'none';
       }
@@ -38,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!userData.password) {
         errors.push('กรุณาใส่รหัสผ่าน');
         passwordButtonContainer.style.display = 'block';
-        loginfailButtonContainer.style.display = 'none'
+        loginfailButtonContainer.style.display = 'none';
       } else {
         passwordButtonContainer.style.display = 'none';
       }
@@ -61,23 +64,27 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const response = await axios.post(`${BASE_URL}/login`, loginData);
-      console.log('response', response.data.message);
 
-      sessionStorage.setItem('token', response.data.token);
+      // ตรวจสอบการตอบกลับจาก server ว่ามี token จริงหรือไม่
+      if (response.data.token) {
+        sessionStorage.setItem('token', response.data.token);
 
-      // ใช้ history.replaceState เพื่อแทนที่ประวัติการเข้าชม
-      window.history.replaceState({}, '', '/payment');
-      window.location.href = '/payment';
+        // // ใช้ history.replaceState เพื่อแทนที่ประวัติการเข้าชม
+        window.history.replaceState({}, '', '/');
+        window.location.href = '/';
+      } else {
+        throw new Error('Token not received from server');
+      }
 
     } catch (error) {
-      console.log('error message', error.message);
       if (error.response) {
         console.log(error.response.data.errors);
-        if (error.response.data.errors == "อีเมล์ หรือ รหัสผ่านไม่ถูกต้อง"){
-          loginfailButtonContainer.innerText = "อีเมล์ หรือ รหัสผ่านไม่ถูกต้อง"
-          loginfailButtonContainer.style.display = 'block'
-
+        if (error.response.data.errors.includes("อีเมล์ หรือ รหัสผ่านไม่ถูกต้อง")) {
+          loginfailButtonContainer.innerText = "อีเมล์ หรือ รหัสผ่านไม่ถูกต้อง";
+          loginfailButtonContainer.style.display = 'block';
         }
+      } else {
+        console.error('Error:', error.message);
       }
     }
   };
@@ -96,3 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ตรวจสอบสถานะการเข้าสู่ระบบเมื่อโหลดหน้า
   checkLoginStatus();
 });
+
+const linkToSignUp = () => {
+  window.location.replace(`./register.html`)
+}
