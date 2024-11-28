@@ -20,7 +20,7 @@ const PORT = 8000;
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:8000/oauth2callback';
-const SECRET = 'sawaddeekub'
+const SECRET = process.env.SECRET
 
 // Middleware
 app.use(cors());
