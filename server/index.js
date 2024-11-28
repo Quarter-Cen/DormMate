@@ -13,11 +13,12 @@ const jwt = require('jsonwebtoken')
 const multer = require('multer')
 const axios = require('axios');
 const FormData = require('form-data');
+require('dotenv').config();
 
 // Constants
 const PORT = 8000;
-const CLIENT_ID = '206205769825-982qc9ql6h3dso6ik6csmttbrjfr61nu.apps.googleusercontent.com';
-const CLIENT_SECRET = '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';
+const CLIENT_ID = process.env.CLIENT_ID;
+const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = 'http://localhost:8000/oauth2callback';
 const SECRET = 'sawaddeekub'
 
@@ -823,12 +824,6 @@ app.post('/slip-check/:id', authenticateToken, upload.single('files'), async (re
         }
     }
 });
-
-app.post('/test', (req, res) => {
-    res.json({
-        message: "hapi",
-    })
-})
 
 // Start the server
 app.listen(PORT, async () => {
